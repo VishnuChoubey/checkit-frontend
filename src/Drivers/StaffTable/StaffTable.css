@@ -1,0 +1,29 @@
+.recentStaff {
+    position: relative;
+    display: grid;
+    min-height: 500px;
+    background: var(--white);
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.8);
+    border-radius: 20px;
+}
+
+.statusactive {
+    padding: 2px 4px;
+    background: green;
+    color: var(--white);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.statusinactive {
+    padding: 2px 4px;
+    background: orange;
+    color: var(--white);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Reuse other styles from DriversTable.css */

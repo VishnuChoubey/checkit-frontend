@@ -1,0 +1,92 @@
+.availBuses {
+    position: relative;
+    display: grid;
+    min-height: 500px;
+    background: var(--white);
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.8);
+    border-radius: 20px;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cardHeader h2 {
+    font-weight: 600;
+    color: var(--blue);
+}
+
+.btn {
+    position: relative;
+    padding: 5px 10px;
+    background: var(--blue);
+    text-decoration: none;
+    color: var(--white);
+    border-radius: 6px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table thead td {
+    font-weight: 600;
+}
+
+.availBuses table thead tr {
+    color: var(--black1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+}
+
+.availBuses table tbody tr:hover {
+    background: var(--blue);
+    color: var(--white)
+}
+
+.availBuses table tr td {
+    padding: 10px;
+}
+
+.availBuses table tr td:last-child {
+    text-align: end;
+}
+
+.availBuses table tr td:nth-child(2) {
+    text-align: end;
+}
+
+.availBuses table tr td:nth-child(3) {
+    text-align: center;
+}
+
+.statusrunning {
+    padding: 2px 4px;
+    background: greenyellow;
+    color: var(--white);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.statusvacant {
+    padding: 2px 4px;
+    background: lightblue;
+    color: var(--white);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.statusbroken {
+    padding: 2px 4px;
+    background: red;
+    color: var(--white);
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+}

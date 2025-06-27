@@ -1,0 +1,311 @@
+.passenger-container {
+  padding: 20px;
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+}
+
+.passenger-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.passenger-greeting h2 {
+  color: var(--blue);
+  margin-bottom: 5px;
+}
+
+.passenger-greeting p {
+  color: var(--black2);
+  margin: 0;
+}
+
+.wallet-balance {
+  display: flex;
+  align-items: center;
+  background: var(--grey);
+  padding: 15px 20px;
+  border-radius: 10px;
+  gap: 15px;
+}
+
+.wallet-balance ion-icon {
+  font-size: 2rem;
+  color: var(--blue);
+}
+
+.wallet-balance div {
+  display: flex;
+  flex-direction: column;
+}
+
+.wallet-balance span {
+  color: var(--black2);
+  font-size: 0.9rem;
+}
+
+.wallet-balance h3 {
+  margin: 0;
+  color: var(--black1);
+}
+
+.btn-add-money {
+  background: var(--blue);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.passenger-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--grey);
+  margin-bottom: 20px;
+}
+
+.passenger-tabs button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--black2);
+  position: relative;
+}
+
+.passenger-tabs button.active {
+  color: var(--blue);
+  font-weight: 500;
+}
+
+.passenger-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--blue);
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.quick-action {
+  background: var(--grey);
+  border: none;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.quick-action:hover {
+  transform: translateY(-3px);
+}
+
+.quick-action ion-icon {
+  font-size: 1.8rem;
+  color: var(--blue);
+}
+
+.upcoming-trips h3 {
+  color: var(--black1);
+  margin-bottom: 15px;
+}
+
+.trip-card {
+  background: var(--grey);
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trip-info h4 {
+  margin: 0 0 5px 0;
+  color: var(--black1);
+}
+
+.trip-info p {
+  margin: 0;
+  color: var(--black2);
+}
+
+.trip-status {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+.trip-status.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.btn-view {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--black2);
+  cursor: pointer;
+}
+
+.tickets-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tickets-table th {
+  text-align: left;
+  padding: 12px 15px;
+  background: var(--grey);
+  color: var(--black1);
+}
+
+.tickets-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--grey);
+}
+
+.ticket-status {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.ticket-status.used {
+  background: #d4edda;
+  color: #155724;
+}
+
+.ticket-status.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.btn-details {
+  background: var(--blue);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.favorite-routes {
+  display: grid;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.route-card {
+  background: var(--grey);
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.route-info h4 {
+  margin: 0 0 5px 0;
+  color: var(--black1);
+}
+
+.route-info p {
+  margin: 0;
+  color: var(--black2);
+}
+
+.route-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-book {
+  background: var(--blue);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.btn-remove {
+  background: #f8d7da;
+  color: #721c24;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-add-route {
+  background: none;
+  border: 1px dashed var(--black2);
+  color: var(--black2);
+  padding: 10px 15px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .passenger-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .wallet-balance {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .passenger-tabs {
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+  
+  .tickets-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -179,15 +179,20 @@ const Navbar = () => {
             max-width: 70px;
             text-align: left;
           }
+          @media (max-width: 768px) {
           .sidebar-navbar ul {
             flex-direction: row;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;         /* Prevent wrapping */
+            overflow-x: auto;          /* Enable horizontal scroll */
             padding: 0.5rem;
+            gap: 0.5rem;
           }
           .sidebar-navbar li {
             margin-bottom: 0;
             margin-right: 0.5rem;
+            flex: 0 0 auto;            /* Prevent shrinking/growing */
           }
+        }
           .sidebar-navbar .logout-btn {
             width: auto;
             margin: 0 0rem 0 0rem;

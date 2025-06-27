@@ -108,8 +108,13 @@ const Registration = () => {
     }
 
     try {
+
+      console.log("Submitting registration form:");
+for (let pair of registerForm.entries()) {
+  console.log(pair[0] + ": ", pair[1]);
+}
       const response = await axios.post(
-        "http://localhost:8080/api/auth/register",
+        "http://localhost:8080/api/auth/registerdriver",
         registerForm,
         {
           headers: {

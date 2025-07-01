@@ -67,6 +67,7 @@ const Navbar = () => {
           display: flex;
           flex-direction: column;
           z-index: 50;
+          transition: left 0.3s;
         }
         .sidebar-navbar .user-info {
           display: flex;
@@ -136,7 +137,7 @@ const Navbar = () => {
         }
         .sidebar-navbar .logout-btn {
           width: 90%;
-           margin: 0.5rem auto 0.0rem auto; 
+          margin: 0.5rem auto 0.0rem auto; 
           background: #dc2626;
           color: #fff;
           border: none;
@@ -154,14 +155,23 @@ const Navbar = () => {
         .sidebar-navbar .fill-space {
           flex: 1;
         }
+        .mobile-nav-toggle {
+          display: none;
+        }
         @media (max-width: 768px) {
           .sidebar-navbar {
-            position: static;
-            width: 100%;
-            height: auto;
-            flex-direction: row;
+            position: fixed;
+            left: ${navOpen ? "0" : "-100vw"};
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: column;
             border-radius: 0;
             min-width: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: #16a34a;
+            z-index: 100;
+            transition: left 0.3s;
           }
           .sidebar-navbar .user-info {
             flex-direction: row;
@@ -179,29 +189,46 @@ const Navbar = () => {
             max-width: 70px;
             text-align: left;
           }
-          @media (max-width: 768px) {
           .sidebar-navbar ul {
             flex-direction: row;
-            flex-wrap: nowrap;         /* Prevent wrapping */
-            overflow-x: auto;          /* Enable horizontal scroll */
+            flex-wrap: nowrap;
+            overflow-x: auto;
             padding: 0.5rem;
             gap: 0.5rem;
+            margin: 0;
           }
           .sidebar-navbar li {
             margin-bottom: 0;
             margin-right: 0.5rem;
-            flex: 0 0 auto;            /* Prevent shrinking/growing */
+            flex: 0 0 auto;
           }
-        }
           .sidebar-navbar .logout-btn {
             width: auto;
             margin: 0 0rem 0 0rem;
             padding: 0rem 0rem;
           }
+          .mobile-nav-toggle {
+            display: block;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: none;
+            border: none;
+            color: #16a34a;
+            font-size: 2rem;
+            z-index: 200;
+          }
         }
       `}</style>
-      <nav className="sidebar-navbar">
-                <div className="user-info">
+      <button
+        className="mobile-nav-toggle"
+        onClick={() => setNavOpen((open) => !open)}
+        aria-label="Toggle navigation"
+      >
+        {navOpen ? <FaTimes /> : <FaBars />}
+      </button>
+      <nav className="sidebar-navbar" style={{ left: window.innerWidth <= 768 && !navOpen ? "-100vw" : "0" }}>
+        <div className="user-info">
           {loadingProfile ? (
             <>
               <img
@@ -210,7 +237,6 @@ const Navbar = () => {
                 className="user-photo"
               />
               <span style={{ color: "#fff", fontWeight: 600 }}>Loading...</span>
-        
             </>
           ) : !profile || !profile.profilePictureUrl || !profile.name ? (
             <>
@@ -220,7 +246,6 @@ const Navbar = () => {
                 className="user-photo"
               />
               <span className="user-name">User</span>
-              {/* Only show logout if logged in */}
               {localStorage.getItem("accessToken") && (
                 <button className="logout-btn" onClick={handleLogout}>Logout</button>
               )}
@@ -240,7 +265,9 @@ const Navbar = () => {
                 onError={e => { e.target.onerror = null; e.target.src = "https://ui-avatars.com/api/?name=User"; }}
               />
               <span className="user-name" title={profile.name}>{profile.name || "User"}</span>
-              <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              {localStorage.getItem("accessToken") && (
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              )}
             </>
           )}
         </div>
@@ -252,6 +279,7 @@ const Navbar = () => {
                 className={({ isActive }) =>
                   `nav-link${isActive ? " active" : ""}`
                 }
+                onClick={() => setNavOpen(false)}
               >
                 <ion-icon name={item.icon}></ion-icon>
                 <span>{item.title}</span>
@@ -260,7 +288,6 @@ const Navbar = () => {
           ))}
         </ul>
         <div className="fill-space"></div>
-      
       </nav>
     </>
   );

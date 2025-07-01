@@ -96,7 +96,10 @@ const Registration = () => {
     registerForm.append("email", email);
     registerForm.append("phone", phone);
     registerForm.append("licenseNumber", licenseNumber);
-    registerForm.append("licenseExpiry", licenseExpiry);
+    registerForm.append(
+  "licenseExpiry",
+  licenseExpiry ? licenseExpiry.toISOString() : ""
+);
     registerForm.append("address", address);
     registerForm.append("experience", experience);
     registerForm.append("emergencyName", emergencyName);
@@ -118,7 +121,7 @@ for (let pair of registerForm.entries()) {
         registerForm,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+           
           },
         }
       );

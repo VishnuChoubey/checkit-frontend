@@ -20,16 +20,6 @@ const Home = () => {
   return (
     <>
       <style>{`
-     
-        // .home-main {
-        //   flex: 1;
-        //   display: flex;
-        //   flex-direction: column;
-        //   align-items: center;
-        //   justify-content: center;
-        //   padding: 0rem;
-          
-        // }
         .home-card-container {
         max-width: 1200px;
        margin: 0.2rem 0.4rem 0.5rem 0.4rem;

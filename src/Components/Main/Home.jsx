@@ -139,28 +139,36 @@ const Home = () => {
         .home-btn-user:hover {
           background: linear-gradient(90deg, #16a34a 60%, #15803d 100%);
         }
-           @media (max-width: 900px) {
-          .home-card {
-          display: flex;
-            flex-direction: column;
-            grid-template-columns: 1fr;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 2rem;
-           
+          @media (max-width: 900px) {
+  .home-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 1.5rem;
+  }
 
-          }
-           
-          .home-main-title {
-            font-size: 3rem;
-            text-align: center;
+  .home-img {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+  }
 
-           }
-            .home-why-list {
-            font-size: 2.2rem;
-      }
-         
-        }
+  .home-main-title,
+  .home-main-subtitle,
+  .home-main-desc,
+  .home-why-title,
+  .home-why-list {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .home-why-list {
+    font-size: 1rem;
+    padding-left: 1.5rem;
+  }
+}
+
       `}</style>
       <>
 

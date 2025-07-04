@@ -204,7 +204,7 @@ const [profile, setProfile] = useState(null);
         }
            @media (max-width: 768px) {
           .sidebar-navbar {
-            width: 30vw;
+            width: 60vw;
           }
         }
        

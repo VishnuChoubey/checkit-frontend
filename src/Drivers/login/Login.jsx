@@ -193,8 +193,6 @@ const Login = () => {
   .user-login-card {
     padding: 1.5rem 1rem;
     max-width: 95%;
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .user-login-title {

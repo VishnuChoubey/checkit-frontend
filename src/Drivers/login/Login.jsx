@@ -74,7 +74,7 @@ const Login = () => {
           max-width: 370px;
           width: 100%;
           position: relative;
-          margin-left:18rem;
+         
         }
         .user-login-separator {
           position: absolute;
@@ -182,26 +182,25 @@ const Login = () => {
           margin-right: 0.4rem;
           background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
           align-self: center;
-      @media (max-width: 600px) {
-  .home-card {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
+       @media (max-width: 600px) {
+          .home-card {
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem;
+          }
 
-  .user-login-card {
-    padding: 1.5rem 1rem;
-    max-width: 95%;
-  }
+          .user-login-card {
+            padding: 1.5rem 1rem;
+            max-width: 95%;
+          }
 
-  .user-login-title {
-    font-size: 1.5rem;
-  }
+          .user-login-title {
+            font-size: 1.5rem;
+          }
 
-  .user-login-subtitle {
-    font-size: 1rem;
-  }
+          .user-login-subtitle {
+            font-size: 1rem;
+          }
 
   .user-login-btn {
     font-size: 1rem;
@@ -212,6 +211,7 @@ const Login = () => {
     font-size: 0.95rem;
   }
 }
+
 
       `}</style>
       <div className="home-card">

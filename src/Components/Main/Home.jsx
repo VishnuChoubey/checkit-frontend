@@ -153,15 +153,29 @@ const Home = () => {
     margin: 0 auto;
   }
 
-  .home-main-title,
+
   .home-main-subtitle,
   .home-main-desc,
-  .home-why-title,
   .home-why-list {
     text-align: center;
     margin-left: auto;
     margin-right: auto;
   }
+     .home-why-title{
+     font-size: 1.5rem;
+      text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+     
+     }
+
+       .home-main-title{
+       font-size: 2.5rem;
+        text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+       
+       }
 
   .home-why-list {
     font-size: 1rem;

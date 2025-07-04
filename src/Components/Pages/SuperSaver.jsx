@@ -28,7 +28,7 @@ const SuperSaver = () => (
     <style>{`
       .super-saver-container {
         display: flex;
-         
+         flex-direction: row;
           gap: 3rem;
          
           background: #fff;

@@ -159,7 +159,7 @@ const Home = () => {
             .home-why-list {
             font-size: 2.2rem;
       }
-           
+         
         }
       `}</style>
       <>

@@ -284,6 +284,7 @@ for (let pair of registerForm.entries()) {
         }
         @media (max-width: 600px) {
           .registration-card {
+          display: flex;
             padding: 1.2rem 0.5rem 1rem 0.5rem;
             max-width: 98vw;
           }

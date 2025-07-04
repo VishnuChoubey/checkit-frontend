@@ -20,6 +20,7 @@ const Home = () => {
   return (
     <>
       <style>{`
+
         .home-card-container {
         max-width: 1200px;
        margin: 0.2rem 0.4rem 0.5rem 0.4rem;
@@ -140,6 +141,8 @@ const Home = () => {
         }
            @media (max-width: 900px) {
           .home-card {
+          display: flex;
+            flex-direction: column;
             grid-template-columns: 1fr;
             flex-direction: row;
             flex-wrap: wrap;

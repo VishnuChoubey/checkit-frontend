@@ -13,7 +13,7 @@ const CheckItCard = ({
         display: grid;
          
           gap: 3rem;
-         
+         display: flex;
           background: #fff;
           border-radius: 2rem;
           box-shadow: 0 8px 32px rgba(22,163,74,0.13), 0 2px 8px rgba(22,163,74,0.08);

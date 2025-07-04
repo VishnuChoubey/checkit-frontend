@@ -123,7 +123,7 @@ const RegistrationUser = () => {
           margin-left: 0.4rem;
           margin-right: 0.4rem;
           background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
-         
+         display: flex;
           
         }
       

@@ -65,7 +65,21 @@ const LoginPage = () => {
   return (
     <>
       <style>{`
-      
+               .home-card {
+          display: flex;
+          gap: 3rem;
+          align-items: center;
+          background: #fff;
+          border-radius: 2rem;
+          box-shadow: 0 8px 32px rgba(22,163,74,0.13), 0 2px 8px rgba(22,163,74,0.08);
+          padding: 2rem 2rem 2rem 2rem;
+          margin-top: 0;
+          margin-bottom: 0.5rem;
+          margin-left: 0.4rem;
+          margin-right: 0.4rem;
+          background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
+          align-self: center;
+        }
          .user-login-card {
           background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
           border-radius: 1.5rem;
@@ -74,7 +88,7 @@ const LoginPage = () => {
           max-width: 370px;
           width: 100%;
           position: relative;
-          margin-left:18rem;
+          margin: 0 auto;
         }
         .user-login-separator {
           position: absolute;
@@ -167,22 +181,7 @@ const LoginPage = () => {
           color: #0ea5e9;
           text-decoration: underline;
         }
-            .home-card {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 3rem;
-          align-items: center;
-          background: #fff;
-          border-radius: 2rem;
-          box-shadow: 0 8px 32px rgba(22,163,74,0.13), 0 2px 8px rgba(22,163,74,0.08);
-          padding: 2rem 2rem 2rem 2rem;
-          margin-top: 0;
-          margin-bottom: 0.5rem;
-          margin-left: 0.4rem;
-          margin-right: 0.4rem;
-          background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
-          align-self: center;
-        }
+       
       `}</style>
       <div className="home-card">
         <div className="user-login-card">

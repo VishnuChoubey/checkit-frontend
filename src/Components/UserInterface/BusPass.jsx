@@ -48,7 +48,7 @@ const BusPass = () => {
     <>
       <style>{`
         .buspass-main-bg {
-          display: grid;
+          display: flex;
          
           gap: 3rem;
          

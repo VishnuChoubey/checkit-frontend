@@ -6,7 +6,7 @@ const CheckInCities = () => (
    
     <style>{`
       .cities-container {
-       display: grid;
+       display: flex;
          
           gap: 3rem;
          

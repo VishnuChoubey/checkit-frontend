@@ -99,6 +99,7 @@ const PassengerDashboard = () => {
           min-height: 80vh;
           padding-left: 2rem;
           padding-right: 0px;
+          display: flex;
         }
         .passenger-header {
         background: #f0fdf4;

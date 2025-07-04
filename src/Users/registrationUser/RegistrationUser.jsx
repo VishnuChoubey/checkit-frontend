@@ -242,6 +242,7 @@ const RegistrationUser = () => {
 /* Mobile-specific styles */
 @media (max-width: 600px) {
   .registration-bg {
+  display: flex;
     flex-direction: column;
     gap: 1.2rem;
     padding: 1.2rem;

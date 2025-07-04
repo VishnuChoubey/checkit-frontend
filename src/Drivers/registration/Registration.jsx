@@ -282,17 +282,21 @@ for (let pair of registerForm.entries()) {
         .register-btn:hover {
           background: linear-gradient(90deg, #15803d 60%, #0ea5e9 100%);
         }
-        @media (max-width: 600px) {
-          .registration-card {
-          display: flex;
-            padding: 1.2rem 0.5rem 1rem 0.5rem;
-            max-width: 98vw;
-          }
-          .form-row {
-            flex-direction: column;
-            gap: 0;
-          }
-        }
+       @media (max-width: 600px) {
+  .registration-card {
+    display: flex;
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+    max-width: 98vw;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
         .footer-bottom {
           text-align: center !important;
         }

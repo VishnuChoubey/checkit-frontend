@@ -66,8 +66,8 @@ const Login = () => {
     <>
       <style>{`
                 .home-card {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
+          display: flex;
+  
           gap: 3rem;
           align-items: center;
           background: #fff;
@@ -89,7 +89,7 @@ const Login = () => {
           max-width: 370px;
           width: 100%;
           position: relative;
-         
+         margin: 0 auto;
         }
         .user-login-separator {
           position: absolute;

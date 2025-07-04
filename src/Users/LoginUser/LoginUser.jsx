@@ -181,6 +181,36 @@ const LoginPage = () => {
           color: #0ea5e9;
           text-decoration: underline;
         }
+          @media (max-width: 600px) {
+          .home-card {
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem;
+          }
+
+          .user-login-card {
+            padding: 1.5rem 1rem;
+            max-width: 95%;
+          }
+
+          .user-login-title {
+            font-size: 1.5rem;
+          }
+
+          .user-login-subtitle {
+            font-size: 1rem;
+          }
+
+  .user-login-btn {
+    font-size: 1rem;
+    padding: 0.6rem;
+  }
+
+  .form-group input {
+    font-size: 0.95rem;
+  }
+}
+
        
       `}</style>
       <div className="home-card">

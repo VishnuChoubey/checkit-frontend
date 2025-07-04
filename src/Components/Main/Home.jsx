@@ -63,6 +63,9 @@ const Home = () => {
           margin-bottom: 0.5rem;
           margin-left: 0rem;
           background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
+         box-shadow: 2px 4px 16px rgba(22, 163, 74, 0.15);
+         
+          
         }
        
         .home-img {
@@ -169,7 +172,7 @@ const Home = () => {
       <>
 
           <div className="home-card-container">
-            <div className="home-sep-bar"></div>
+            {/* <div className="home-sep-bar"></div> */}
             <div className="home-card">
               {/* Left Side: Image and Content */}
               <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>

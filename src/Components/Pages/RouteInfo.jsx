@@ -122,6 +122,7 @@ const RouteInfo = () => {
       
         .routeinfo-main {
            display: flex;
+          flex-direction: column;
           border-radius: 2rem;             /* Tailwind: rounded-2xl = 1rem (16px) */
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Tailwind: shadow-2xl */
           padding: 1.5rem;                 /* Tailwind: p-6 = 1.5rem */

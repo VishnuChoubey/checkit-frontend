@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 
 const menuItems = [
@@ -12,19 +12,37 @@ const menuItems = [
   { icon: "flask-outline", title: "Try Check In", link: "/app-features" },
 ];
 
-const Navbar = () => {
-  const [navOpen, setNavOpen] = useState(false);
-  const [profile, setProfile] = useState(null);
+const Navbar = ({ navOpen, setNavOpen, windowWidth }) => {
+const [profile, setProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [profileError, setProfileError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    if (windowWidth <= 1024 && navOpen) {
+      const handleClickOutside = (e) => {
+        if (!e.target.closest('.sidebar-navbar') && !e.target.closest('.mobile-nav-toggle')) {
+          setNavOpen(false);
+        }
+      };
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [navOpen, windowWidth, setNavOpen]);
+
 
   useEffect(() => {
     const fetchProfile = async () => {
       setLoadingProfile(true);
-      setProfileError("");
+    
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setProfile(null);
+        setLoadingProfile(false);
+        return;
+      }
       try {
-        const token = localStorage.getItem("accessToken");
         const response = await fetch("http://localhost:8080/api/user/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -42,13 +60,16 @@ const Navbar = () => {
       setLoadingProfile(false);
     };
     fetchProfile();
-  }, []);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    setProfile(null);
+    setLoadingProfile(false);
     navigate("/LoginUser");
   };
+
 
   return (
     <>
@@ -56,25 +77,26 @@ const Navbar = () => {
         .sidebar-navbar {
           background: #16a34a;
           color: #fff;
-          border-radius: 1rem;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-          min-width: 220px;
-          width: 220px;
+          width: ${windowWidth > 1024 ? '220px' : windowWidth > 768 ? '280px' : '75vw'};
+          max-width: 100%;
           height: 100vh;
           position: fixed;
           top: 0;
-          left: 0;
-          display: flex;
-          flex-direction: column;
-          z-index: 50;
-          transition: left 0.3s;
+          left: ${navOpen ? '0' : '-100%'};
+          z-index: 1000;
+          transition: left 0.3s ease;
+          overflow-y: auto;
+          box-shadow: ${navOpen && windowWidth <= 1024 ? '2px 0 10px rgba(0,0,0,0.2)' : 'none'};
+          border-radius: 1rem;
         }
+        
         .sidebar-navbar .user-info {
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 2rem 1rem 1.5rem 1rem;
+          padding: 2rem 1rem 1.5rem;
         }
+        
         .sidebar-navbar .user-photo {
           width: 60px;
           height: 60px;
@@ -85,6 +107,7 @@ const Navbar = () => {
           margin-bottom: 0.7rem;
           background: #e5e7eb;
         }
+        
         .sidebar-navbar .user-name {
           font-size: 1.08rem;
           font-weight: 700;
@@ -97,12 +120,7 @@ const Navbar = () => {
           display: block;
           text-align: center;
         }
-        .sidebar-navbar .profile-error {
-          color: #fff;
-          font-weight: 600;
-          font-size: 1rem;
-          margin-top: 0.5rem;
-        }
+        
         .sidebar-navbar ul {
           list-style: none;
           margin: 0;
@@ -110,11 +128,12 @@ const Navbar = () => {
           flex: 1;
           display: flex;
           flex-direction: column;
-          justify-content: flex-start;
         }
+        
         .sidebar-navbar li {
           margin-bottom: 0.5rem;
         }
+        
         .sidebar-navbar .nav-link {
           display: flex;
           align-items: center;
@@ -124,110 +143,101 @@ const Navbar = () => {
           color: #fff;
           text-decoration: none;
           font-size: 1rem;
-          transition: background 0.2s, color 0.2s;
+          transition: background 0.2s;
         }
+        
         .sidebar-navbar .nav-link.active,
         .sidebar-navbar .nav-link:focus {
           background: #166534;
-          color: #fff;
         }
+        
         .sidebar-navbar .nav-link:hover {
           background: #15803d;
-          color: #d1fae5;
         }
+        
         .sidebar-navbar .logout-btn {
           width: 90%;
-          margin: 0.5rem auto 0.0rem auto; 
+          margin: 1rem auto;
           background: #dc2626;
           color: #fff;
           border: none;
           border-radius: 0.5rem;
-          padding: 0.3rem 0;
-          font-size: 1.05rem;
+          padding: 0.5rem;
+          font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
           transition: background 0.2s;
-          display: block;
         }
+        
         .sidebar-navbar .logout-btn:hover {
           background: #b91c1c;
         }
-        .sidebar-navbar .fill-space {
-          flex: 1;
+        
+         .mobile-nav-toggle {
+          display: ${windowWidth <= 1024 ? 'flex' : 'none'};
+          position: fixed;
+          top: 1rem;
+          left: 1rem;
+          background: #fff;
+          border: none;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+          z-index: 1100;
+          cursor: pointer;
+          color: #16a34a;
         }
-        .mobile-nav-toggle {
-          display: none;
+           .close-sidebar {
+          display: ${windowWidth <= 1024 && navOpen ? 'block' : 'none'};
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: transparent;
+          border: none;
+          color: white;
+          font-size: 1.5rem;
+          cursor: pointer;
+          z-index: 1001;
         }
-        @media (max-width: 768px) {
+           @media (max-width: 768px) {
           .sidebar-navbar {
-            position: fixed;
-            left: ${navOpen ? "0" : "-100vw"};
-            top: 0;
-            width: 100vw;
-            height: 100vh;
-            flex-direction: column;
-            border-radius: 0;
-            min-width: 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            background: #16a34a;
-            z-index: 100;
-            transition: left 0.3s;
+            width: 30vw;
           }
+        }
+       
+          
           .sidebar-navbar .user-info {
-            flex-direction: row;
-            padding: 1rem 0.5rem;
-            align-items: center;
-            justify-content: flex-start;
+            padding: 1.5rem 1rem;
           }
+          
           .sidebar-navbar .user-photo {
-            width: 40px;
-            height: 40px;
-            margin-bottom: 0;
-            margin-right: 0.7rem;
-          }
-          .sidebar-navbar .user-name {
-            max-width: 70px;
-            text-align: left;
-          }
-          .sidebar-navbar ul {
-            flex-direction: row;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            padding: 0.5rem;
-            gap: 0.5rem;
-            margin: 0;
-          }
-          .sidebar-navbar li {
-            margin-bottom: 0;
-            margin-right: 0.5rem;
-            flex: 0 0 auto;
-          }
-          .sidebar-navbar .logout-btn {
-            width: auto;
-            margin: 0 0rem 0 0rem;
-            padding: 0rem 0rem;
-          }
-          .mobile-nav-toggle {
-            display: block;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            background: none;
-            border: none;
-            color: #16a34a;
-            font-size: 2rem;
-            z-index: 200;
+            width: 50px;
+            height: 50px;
           }
         }
       `}</style>
-      <button
-        className="mobile-nav-toggle"
-        onClick={() => setNavOpen((open) => !open)}
-        aria-label="Toggle navigation"
-      >
-        {navOpen ? <FaTimes /> : <FaBars />}
-      </button>
-      <nav className="sidebar-navbar" style={{ left: window.innerWidth <= 768 && !navOpen ? "-100vw" : "0" }}>
+      
+    {windowWidth <= 1024 && !navOpen && (
+  <button
+    className="mobile-nav-toggle"
+    onClick={() => setNavOpen(true)}
+    aria-label="Toggle navigation"
+  >
+    <FaBars />
+  </button>
+)}
+      
+       <nav className="sidebar-navbar">
+        <button 
+          className="close-sidebar" 
+          onClick={() => setNavOpen(false)}
+          aria-label="Close menu"
+        >
+          <FaTimes />
+        </button>
         <div className="user-info">
           {loadingProfile ? (
             <>
@@ -271,15 +281,14 @@ const Navbar = () => {
             </>
           )}
         </div>
-        <ul>
+        
+          <ul>
           {menuItems.map((item, idx) => (
             <li key={idx}>
               <NavLink
                 to={item.link}
-                className={({ isActive }) =>
-                  `nav-link${isActive ? " active" : ""}`
-                }
-                onClick={() => setNavOpen(false)}
+                className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+                onClick={() => windowWidth <= 1024 && setNavOpen(false)}
               >
                 <ion-icon name={item.icon}></ion-icon>
                 <span>{item.title}</span>
@@ -287,7 +296,6 @@ const Navbar = () => {
             </li>
           ))}
         </ul>
-        <div className="fill-space"></div>
       </nav>
     </>
   );

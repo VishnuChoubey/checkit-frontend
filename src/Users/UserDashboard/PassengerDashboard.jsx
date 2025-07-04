@@ -3,51 +3,14 @@ import Navbar from '../../Components/Main/Navbar';
 
 const PassengerDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [ticketHistory, setTicketHistory] = useState([
-    // {
-    //   id: 1,
-    //   route: "Route 101",
-    //   date: "2024-06-20",
-    //   time: "10:30 AM",
-    //   status: "Completed",
-    //   fare: 25,
-    // },
-    // {
-    //   id: 2,
-    //   route: "Route 202",
-    //   date: "2024-06-18",
-    //   time: "2:15 PM",
-    //   status: "Cancelled",
-    //   fare: 30,
-    // },
-    // {
-    //   id: 3,
-    //   route: "Route 303",
-    //   date: "2024-06-15",
-    //   time: "8:00 AM",
-    //   status: "Completed",
-    //   fare: 20,
-    // },
-  ]);
-  const [walletBalance, setWalletBalance] = useState(350);
-  const [favoriteRoutes, setFavoriteRoutes] = useState([
-    // {
-    //   id: 1,
-    //   name: "Route 101",
-    //   from: "Station A",
-    //   to: "Station B",
-    // },
-    // {
-    //   id: 2,
-    //   name: "Route 202",
-    //   from: "Station C",
-    //   to: "Station D",
-    // },
-  ]);
+  const [ticketHistory, setTicketHistory] = useState([]);
+  const [favoriteRoutes, setFavoriteRoutes] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [profileError, setProfileError] = useState("");
+  const [loadingTickets, setLoadingTickets] = useState(false);
 
+  // Fetch user profile
   useEffect(() => {
     const fetchProfile = async () => {
       setLoadingProfile(true);
@@ -61,7 +24,6 @@ const PassengerDashboard = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          console.log("Profile data:", data);
           setProfile(data);
         } else {
           setProfileError("Failed to load profile.");
@@ -74,29 +36,83 @@ const PassengerDashboard = () => {
     fetchProfile();
   }, []);
 
+  // Fetch ticket history after profile is loaded
+  useEffect(() => {
+    const fetchTickets = async () => {
+      if (!profile?.id) return;
+      setLoadingTickets(true);
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await fetch(
+          `http://localhost:8080/api/user/bookings/${profile.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setTicketHistory(data || []);
+          // Calculate favorite routes
+          const routeMap = {};
+          data.forEach((t) => {
+            const key = `${t.routeNo}|${t.source}|${t.destination}`;
+            routeMap[key] = (routeMap[key] || 0) + 1;
+          });
+          const favs = Object.entries(routeMap)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([key, count]) => {
+              const [routeNo, source, destination] = key.split("|");
+              return { routeNo, source, destination, count };
+            });
+          setFavoriteRoutes(favs);
+        }
+      } catch (err) {
+        // Optionally handle error
+      }
+      setLoadingTickets(false);
+    };
+    fetchTickets();
+  }, [profile]);
+
+  // Helper to format date
+  const formatDate = (iso) => {
+    if (!iso) return "--";
+    const d = new Date(iso);
+    return d.toLocaleDateString() + " " + d.toLocaleTimeString();
+  };
+
   return (
     <>
       <Navbar />
-      <style>{`
+     <style>{`
         .passenger-container {
-          max-width: 1050px;
+        background:linear-gradient(90deg, #d1fae5 60%, #86efac 100%);
+          max-width: 1030px;
           margin: 0 auto;
-          background: #fff;
-          border-radius: 1.2rem;
+          margin-top: 0.2rem;
+          border-radius: 2.5rem;
           box-shadow: 0 2px 12px rgba(22,163,74,0.08);
           padding: 2.5rem 2rem 2rem 2rem;
           min-height: 80vh;
-          padding-left: 150px;
+          padding-left: 2rem;
           padding-right: 0px;
         }
         .passenger-header {
+        background: #f0fdf4;
           display: flex;
-          align-items: center;
+          // align-items: center;
           justify-content: space-between;
           gap: 2rem;
           border-bottom: 1px solid #e5e7eb;
-          padding-bottom: 1.5rem;
+          padding:0.2rem 0.2rem 0.2rem 0.2rem;
           margin-bottom: 1.5rem;
+          margin-left:1rem;
+          max-width: 930px;
+          border-radius: 1.2rem;
+
         }
         .profile-section {
           display: flex;
@@ -104,8 +120,8 @@ const PassengerDashboard = () => {
           gap: 1.5rem;
         }
         .profile-picture {
-          width: 90px;
-          height: 90px;
+          width: 80px;
+          height: 80px;
           border-radius: 50%;
           object-fit: cover;
           border: 3px solid #16a34a;
@@ -201,10 +217,13 @@ const PassengerDashboard = () => {
 .tickets-content,
 .routes-content {
   margin-top: 2rem;
+  margin-left: 0.9rem;
+  margin-right: 3.5rem;
   padding: 1.5rem;
   background-color: #f9f9f9;
-  border-radius: 12px;
+  border-radius: 1.2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 940px;
 }
 
 .dashboard-content h2 {
@@ -325,7 +344,7 @@ const PassengerDashboard = () => {
             <ion-icon name="wallet-outline"></ion-icon>
             <div>
               <span>Wallet Balance</span>
-              <h3>₹{0}</h3>
+              <h3>₹{profile?.walletBalance ?? 0}</h3>
             </div>
             <button className="btn-add-money">
               <ion-icon name="add-outline"></ion-icon> Add Money
@@ -356,57 +375,76 @@ const PassengerDashboard = () => {
         {/* Dashboard Tab */}
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
-  <h2>Welcome{profile && profile.name ? `, ${profile.name}` : ""}!</h2>
-  <p className="dashboard-subtitle">
-    Manage your tickets, wallet, and favorite routes all in one place.
-  </p>
-
-  <div className="dashboard-cards">
-    <div className="dashboard-card">
-      <i className="fa fa-ticket" />
-      <h4>Ticket History</h4>
-      <p>Review your previous travel details and rebook easily.</p>
-    </div>
-    <div className="dashboard-card">
-      <i className="fa fa-wallet" />
-      <h4>Wallet</h4>
-      <p>Check your balance, add funds, or manage transactions.</p>
-    </div>
-    <div className="dashboard-card">
-      <i className="fa fa-map-marker" />
-      <h4>Favorite Routes</h4>
-      <p>Track and manage your most used bus routes.</p>
-    </div>
-  </div>
-</div>
-
+            <h2>Welcome{profile && profile.name ? `, ${profile.name}` : ""}!</h2>
+            <p className="dashboard-subtitle">
+              Manage your tickets, wallet, and favorite routes all in one place.
+            </p>
+            <div className="dashboard-cards">
+              <div className="dashboard-card">
+                <i className="fa fa-ticket" />
+                <h4>Ticket History</h4>
+                <p>You have booked <b>{ticketHistory.length}</b> tickets.</p>
+              </div>
+              <div className="dashboard-card">
+                <i className="fa fa-wallet" />
+                <h4>Wallet</h4>
+                <p>Balance: <b>₹{profile?.walletBalance ?? 0}</b></p>
+              </div>
+              <div className="dashboard-card">
+                <i className="fa fa-map-marker" />
+                <h4>Favorite Routes</h4>
+                <p>
+                  {favoriteRoutes.length === 0
+                    ? "No favorite routes yet."
+                    : favoriteRoutes
+                        .map(
+                          (r) =>
+                            `${r.source} → ${r.destination} (${r.routeNo})`
+                        )
+                        .join(", ")}
+                </p>
+              </div>
+            </div>
+          </div>
         )}
         {/* Tickets Tab */}
         {activeTab === 'tickets' && (
           <div className="tickets-content">
             <h2>My Tickets</h2>
-            <table className="ticket-table">
-              <thead>
-                <tr>
-                  <th>Route</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Status</th>
-                  <th>Fare</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ticketHistory.map((ticket) => (
-                  <tr key={ticket.id}>
-                    <td>{ticket.route}</td>
-                    <td>{ticket.date}</td>
-                    <td>{ticket.time}</td>
-                    <td className={`status-${ticket.status}`}>{ticket.status}</td>
-                    <td>₹{ticket.fare}</td>
+            {loadingTickets ? (
+              <div>Loading tickets...</div>
+            ) : ticketHistory.length === 0 ? (
+              <div>No tickets found.</div>
+            ) : (
+              <table className="ticket-table">
+                <thead>
+                  <tr>
+                    <th>Booking ID</th>
+                    <th>Route</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Passengers</th>
+                    <th>Status</th>
+                    <th>Fare</th>
+                    <th>Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {ticketHistory.map((ticket) => (
+                    <tr key={ticket.id}>
+                      <td>{ticket.bookingId}</td>
+                      <td>{ticket.routeNo}</td>
+                      <td>{ticket.source}</td>
+                      <td>{ticket.destination}</td>
+                      <td>{ticket.passengers}</td>
+                      <td className={`status-${ticket.status}`}>{ticket.status}</td>
+                      <td>₹{ticket.fare ?? "--"}</td>
+                      <td>{formatDate(ticket.bookingDate)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
         {/* Favorite Routes Tab */}
@@ -417,12 +455,13 @@ const PassengerDashboard = () => {
               {favoriteRoutes.length === 0 ? (
                 <p>No favorite routes added yet.</p>
               ) : (
-                favoriteRoutes.map((route) => (
-                  <div className="favorite-route-card" key={route.id}>
-                    <strong>{route.name}</strong>
-                    <span>
-                      {route.from} <ion-icon name="arrow-forward-outline"></ion-icon> {route.to}
-                    </span>
+                favoriteRoutes.map((route, idx) => (
+                  <div className="favorite-route-card" key={idx}>
+                    <strong>
+                      {route.source} <ion-icon name="arrow-forward-outline"></ion-icon> {route.destination}
+                    </strong>
+                    <span>Route No: {route.routeNo}</span>
+                    <span>Booked {route.count} times</span>
                   </div>
                 ))
               )}

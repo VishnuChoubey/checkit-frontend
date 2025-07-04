@@ -78,20 +78,17 @@ const Footer = () => (
         width: 100%;
       }
       @media (max-width: 900px) {
-        .footer-card {
-          padding: 1.5rem 1rem 1.2rem 1rem;
-        }
-        .footer-content {
-          flex-direction: column;
-          align-items: center;
-          gap: 1.2rem;
-        }
-        .footer-section {
-          min-width: 0;
-          width: 100%;
-          text-align: center;
-        }
-      }
+  .footer-content {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  .footer-section {
+    min-width: 120px;
+    width: 45%;
+    text-align: left;
+  }
+}
     `}</style>
 
     <footer className="main-footer">

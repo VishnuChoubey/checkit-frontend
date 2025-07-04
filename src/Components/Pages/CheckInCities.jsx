@@ -3,7 +3,7 @@ import Navbar from "../Main/Navbar.jsx";
 
 const CheckInCities = () => (
   <>
-    <Navbar />
+   
     <style>{`
       .cities-container {
        display: grid;

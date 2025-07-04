@@ -210,9 +210,7 @@ const BusPass = () => {
         }
       `}</style>
       <div className="buspass-main-bg">
-        <div className="buspass-navbar-space">
-          <Navbar />
-        </div>
+       
         <div className="buspass-content">
           <div className="buspass-header">
             <FaArrowLeft className="text-xl cursor-pointer" onClick={goBack} />

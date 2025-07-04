@@ -24,7 +24,7 @@ const superSaverDeals = [
 
 const SuperSaver = () => (
   <>
-    <Navbar />
+   
     <style>{`
       .super-saver-container {
         display: grid;

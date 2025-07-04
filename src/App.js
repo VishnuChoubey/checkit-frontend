@@ -83,7 +83,8 @@ function App() {
         <Route path="/buspass" element={<BusPass />} />
         <Route path="/supersaver" element={<SuperSaver />} />
         <Route path="/allcities" element={<CheckInCities />} />
-           <Route path="driverprofile" element={<DriverProfile />} />
+        
+         <Route path="/driverprofile" element={<DriverProfile />} />
         <Route path="/checkitcard" element={<CheckItCard />} />
 
         <Route path="/routeinfo" element={<RouteInfo />} />

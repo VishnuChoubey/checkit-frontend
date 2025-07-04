@@ -9,7 +9,6 @@ import { Client } from "@stomp/stompjs";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-const SIDEBAR_WIDTH = 220;
 const NEAR_STOP_THRESHOLD = 0.05; // 50 meters
 const STOP_HIGHLIGHT_THRESHOLD = 0.5; // 500 meters
 
@@ -18,212 +17,74 @@ const BusTracker = () => {
   const { routeId, sourceStopId, destStopId, busData } = location.state || {};
   const vehicleId = busData?.vehicleId;
 
-  const mapRef = useRef();
-  const busMarkerRef = useRef();
+  const mapRef = useRef(null);
+  const busMarkerRef = useRef(null);
   const stopMarkersRef = useRef([]);
-  const routeLineRef = useRef();
-  const stompClientRef = useRef();
+  const routeLineRef = useRef(null);
+  const stompClientRef = useRef(null);
 
   const [stops, setStops] = useState([]);
   const [busLocation, setBusLocation] = useState(null);
   const [currentStopIndex, setCurrentStopIndex] = useState(0);
-  const [prevLocation, setPrevLocation] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState("Connecting...");
   const [lastUpdated, setLastUpdated] = useState(null);
   const [eta, setEta] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [osrmError, setOsrmError] = useState("");
+  const [wsError, setWsError] = useState("");
 
   // Fetch stops sequence for the route
-  const fetchStops = useCallback(async () => {
-    if (!routeId) return;
-    try {
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchStops() {
+      if (!routeId) return;
       setConnectionStatus("Loading stops...");
-      const response = await axios.get(`http://localhost:8080/api/vehicle/by-trip/${routeId}`);
-      if (response.data && Array.isArray(response.data)) {
-        let validStops = response.data
-          .filter(stop => stop.latitude && stop.longitude)
-          .sort((a, b) => a.stopSequence - b.stopSequence);
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:8080/api/vehicle/by-trip/${routeId}`);
+        if (cancelled) return;
+        if (response.data && Array.isArray(response.data)) {
+          let validStops = response.data
+            .filter(stop => stop.latitude && stop.longitude)
+            .sort((a, b) => a.stopSequence - b.stopSequence);
 
-        // Reverse if source is after destination
-        const sourceIndex = validStops.findIndex(stop => stop.stopId === sourceStopId);
-        const destIndex = validStops.findIndex(stop => stop.stopId === destStopId);
-        if (sourceIndex !== -1 && destIndex !== -1 && sourceIndex > destIndex) {
-          validStops = validStops.reverse();
-        }
-
-        setStops(validStops);
-        setConnectionStatus("Waiting for bus data...");
-        
-        // Initialize bus location to first stop if no data yet
-        if (!busLocation && validStops.length > 0) {
-          setBusLocation({
-            latitude: validStops[0].latitude,
-            longitude: validStops[0].longitude,
-            stopName: validStops[0].stopName,
-            status: "at stop",
-            speed: "0 km/h"
-          });
-          setCurrentStopIndex(0);
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching stops:", error);
-      setConnectionStatus("Failed to load stops");
-    }
-  }, [routeId, sourceStopId, destStopId, busLocation]);
-
-  // Calculate distance between two points in km
-  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Earth's radius in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }, []);
-
-  // Process bus location updates
-  const processBusUpdate = useCallback((bus) => {
-    if (!bus || typeof bus.longitude === 'undefined' || typeof bus.latitude === 'undefined' || !stops.length) {
-      return;
-    }
-
-    const now = new Date(bus.timestamp || Date.now());
-    setLastUpdated(now);
-
-    const newLocation = {
-      latitude: bus.latitude,
-      longitude: bus.longitude,
-      timestamp: now.toISOString()
-    };
-
-    setPrevLocation(newLocation);
-
-    // Find nearest stop within threshold
-    let nearestStopIndex = currentStopIndex; // Default to current
-    let minDistance = Infinity;
-    let atStop = false;
-
-    stops.forEach((stop, index) => {
-      const distance = calculateDistance(
-        stop.latitude, stop.longitude,
-        newLocation.latitude, newLocation.longitude
-      );
-      
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestStopIndex = index;
-        atStop = distance < NEAR_STOP_THRESHOLD;
-      }
-    });
-
-    // Only update if we found a significantly closer stop
-    if (minDistance < STOP_HIGHLIGHT_THRESHOLD && nearestStopIndex !== currentStopIndex) {
-      setCurrentStopIndex(nearestStopIndex);
-    }
-
-    // Calculate ETA only if moving toward next stop
-    let calculatedEta = null;
-    if (nearestStopIndex < stops.length - 1 && minDistance > NEAR_STOP_THRESHOLD) {
-      const nextStop = stops[nearestStopIndex + 1];
-      const distance = calculateDistance(
-        newLocation.latitude, newLocation.longitude,
-        nextStop.latitude, nextStop.longitude
-      );
-      const speed = bus.speed || 30; // Default to 30 km/h if speed not provided
-      calculatedEta = Math.ceil((distance / speed) * 60);
-    }
-    setEta(calculatedEta);
-
-    setBusLocation({
-      ...newLocation,
-      stopName: stops[nearestStopIndex]?.stopName || "In Transit",
-      status: atStop ? "at stop" : "moving",
-      speed: `${(bus.speed || 0).toFixed(1)} km/h`,
-      heading: bus.heading || "N",
-      nextStop: stops[nearestStopIndex + 1]?.stopName || "End of Route",
-    });
-  }, [stops, prevLocation, calculateDistance, currentStopIndex]);
-
-  // WebSocket connection (reference style)
-  const connectWebSocket = useCallback(() => {
-    if (!vehicleId) return;
-    if (stompClientRef.current) {
-      stompClientRef.current.deactivate();
-    }
-    const socket = new SockJS('http://localhost:8080/ws');
-    const stompClient = new Client({
-      webSocketFactory: () => socket,
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-      onConnect: () => {
-        setConnectionStatus("Connected to real-time data");
-        stompClient.subscribe('/topic/init', (message) => {
-          try {
-            const data = JSON.parse(message.body);
-            console.log(data)
-            if (data.vehicleId === vehicleId) {
-              processBusUpdate(data);
-            }
-          } catch (error) {
-            console.error("Error processing WebSocket data:", error);
-          } finally {
-            setIsLoading(false);
+          // Reverse if source is after destination
+          const sourceIndex = validStops.findIndex(stop => stop.stopId === sourceStopId);
+          const destIndex = validStops.findIndex(stop => stop.stopId === destStopId);
+          if (sourceIndex !== -1 && destIndex !== -1 && sourceIndex > destIndex) {
+            validStops = validStops.reverse();
           }
-        });
-        stompClient.publish({
-          destination: '/app/subscribe',
-          body: JSON.stringify({ vehicles: [vehicleId] }),
-          headers: { 'content-type': 'application/json' }
-        });
-      },
-      onStompError: (frame) => {
-        setConnectionStatus("Connection error");
-        console.error('STOMP error:', frame);
-      },
-      onDisconnect: () => {
-        setConnectionStatus("Disconnected, reconnecting...");
-      },
-    });
-
-    stompClient.activate();
-    stompClientRef.current = stompClient;
-  }, [vehicleId, processBusUpdate]);
-
-  useEffect(() => {
-    if (!routeId || !vehicleId) return;
-    setConnectionStatus("Connecting to real-time data...");
-    setIsLoading(true);
-    connectWebSocket();
-    return () => {
-      if (stompClientRef.current) {
-        stompClientRef.current.deactivate();
+          setStops(validStops);
+          setConnectionStatus("Waiting for bus data...");
+          if (!busLocation && validStops.length > 0) {
+            setBusLocation({
+              latitude: validStops[0].latitude,
+              longitude: validStops[0].longitude,
+              stopName: validStops[0].stopName,
+              status: "at stop",
+              speed: "0 km/h"
+            });
+            setCurrentStopIndex(0);
+          }
+        }
+      } catch (error) {
+        setConnectionStatus("Failed to load stops");
       }
-    };
-  }, [routeId, vehicleId, connectWebSocket]);
-
-  // Initialize Leaflet Map
-  useEffect(() => {
-    if (!stops.length) return;
-
-    // Remove previous map if exists
-    if (mapRef.current) {
-      mapRef.current.remove();
-      mapRef.current = null;
+      setIsLoading(false);
     }
+    fetchStops();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line
+  }, [routeId, sourceStopId, destStopId]);
 
-    // Center on first stop or bus location
-    const center = busLocation
-      ? [busLocation.latitude, busLocation.longitude]
-      : stops[0]
+  // Initialize map only once
+  useEffect(() => {
+    if (!stops.length || mapRef.current) return;
+
+    const center = stops[0]
       ? [stops[0].latitude, stops[0].longitude]
       : [0, 0];
 
-    // Create map
     const map = L.map("bus-map", {
       center,
       zoom: 16,
@@ -231,20 +92,34 @@ const BusTracker = () => {
       attributionControl: false,
     });
 
-    // Add tile layer
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(map);
 
-    // Draw route polyline using OSRM
-    if (stops.length > 1) {
-      const coords = stops.map(stop => [stop.latitude, stop.longitude]);
-      const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${coords
-        .map(c => `${c[1]},${c[0]}`)
-        .join(";")}?overview=full&geometries=geojson`;
+    mapRef.current = map;
 
-      axios.get(osrmUrl).then(res => {
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, [stops]);
+
+  // Draw route polyline using OSRM (only once per stops change)
+  useEffect(() => {
+    if (!mapRef.current || stops.length < 2) return;
+    setOsrmError("");
+    if (routeLineRef.current) {
+      mapRef.current.removeLayer(routeLineRef.current);
+      routeLineRef.current = null;
+    }
+    const coords = stops.map(stop => [stop.latitude, stop.longitude]);
+    const osrmUrl = `http://localhost:5000/match/v1/driving/${coords
+      .map(c => `${c[1]},${c[0]}`)
+      .join(";")}?overview=full&geometries=geojson`;
+
+    axios.get(osrmUrl)
+      .then(res => {
         if (
           res.data &&
           res.data.routes &&
@@ -258,14 +133,22 @@ const BusTracker = () => {
             color: "#3b82f6",
             weight: 4,
             dashArray: "6, 8",
-          }).addTo(map);
-          map.fitBounds(routeLineRef.current.getBounds(), { padding: [40, 40] });
+          }).addTo(mapRef.current);
+          mapRef.current.fitBounds(routeLineRef.current.getBounds(), { padding: [40, 40] });
         }
-      });
-    }
+      })
+      .catch(() => setOsrmError("Failed to load route from OSRM server."));
+    // eslint-disable-next-line
+  }, [stops]);
 
-    // Add stop markers
-    stopMarkersRef.current = stops.map((stop, idx) => {
+  // Add stop markers (only when stops or currentStopIndex changes)
+  useEffect(() => {
+    if (!mapRef.current || !stops.length) return;
+    // Remove old markers
+    stopMarkersRef.current.forEach(marker => mapRef.current.removeLayer(marker));
+    stopMarkersRef.current = [];
+
+    stops.forEach((stop, idx) => {
       const isCurrent = idx === currentStopIndex;
       const isNext = idx === currentStopIndex + 1;
       const isPassed = idx < currentStopIndex;
@@ -280,11 +163,7 @@ const BusTracker = () => {
         className: "",
         html: `<svg width="22" height="22" viewBox="0 0 16 16" fill="${fillColor}" xmlns="http://www.w3.org/2000/svg">
           <circle cx="8" cy="8" r="7" stroke="#fff" stroke-width="2"/>
-          ${
-            isCurrent
-              ? '<text x="8" y="12" font-size="8" text-anchor="middle" fill="white">B</text>'
-              : ""
-          }
+          ${isCurrent ? '<text x="8" y="12" font-size="8" text-anchor="middle" fill="white">B</text>' : ""}
         </svg>`,
         iconSize: [22, 22],
         iconAnchor: [11, 11],
@@ -293,45 +172,20 @@ const BusTracker = () => {
       const marker = L.marker([stop.latitude, stop.longitude], {
         icon,
         title: `${stop.stopName}${isCurrent ? " (Current)" : ""}`,
-      }).addTo(map);
+      }).addTo(mapRef.current);
 
       marker.bindTooltip(
         `${stop.stopName}${isCurrent ? " (Current)" : isNext ? " (Next)" : ""}`,
         { permanent: false, direction: "top" }
       );
 
-      return marker;
+      stopMarkersRef.current.push(marker);
     });
+  }, [stops, currentStopIndex]);
 
-    // Add bus marker if available
-    if (busLocation) {
-      const busIcon = L.divIcon({
-        className: "",
-        html: `<div style="font-size:28px;transform:rotate(0deg)">🚌</div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-      });
-      busMarkerRef.current = L.marker(
-        [busLocation.latitude, busLocation.longitude],
-        { icon: busIcon, title: `Bus (${busLocation.speed})` }
-      ).addTo(map);
-    }
-
-    mapRef.current = map;
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-    // eslint-disable-next-line
-  }, [stops, busLocation, currentStopIndex]);
-
-  // Update bus marker when location changes
+  // Add/update bus marker
   useEffect(() => {
     if (!mapRef.current || !busLocation) return;
-
     if (busMarkerRef.current) {
       busMarkerRef.current.setLatLng([busLocation.latitude, busLocation.longitude]);
     } else {
@@ -346,55 +200,118 @@ const BusTracker = () => {
         { icon: busIcon, title: `Bus (${busLocation.speed})` }
       ).addTo(mapRef.current);
     }
-
-    // Center map on bus if it's moving
-    if (busLocation.status === "moving") {
-      mapRef.current.setView([busLocation.latitude, busLocation.longitude]);
-    }
+    // Optionally center map on bus
+    // mapRef.current.setView([busLocation.latitude, busLocation.longitude]);
   }, [busLocation]);
 
-  // Update stop markers when current stop changes
+  // Calculate distance between two points in km
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }, []);
+
+  // WebSocket connection
   useEffect(() => {
-    if (!stopMarkersRef.current.length) return;
-
-    stopMarkersRef.current.forEach((marker, idx) => {
-      const isCurrent = idx === currentStopIndex;
-      const isNext = idx === currentStopIndex + 1;
-      const isPassed = idx < currentStopIndex;
-
-      let fillColor;
-      if (isCurrent) fillColor = "#2563eb";
-      else if (isNext) fillColor = "#d97706";
-      else if (isPassed) fillColor = "#6b7280";
-      else fillColor = "#16a34a";
-
-      const icon = L.divIcon({
-        className: "",
-        html: `<svg width="22" height="22" viewBox="0 0 16 16" fill="${fillColor}" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="8" cy="8" r="7" stroke="#fff" stroke-width="2"/>
-          ${
-            isCurrent
-              ? '<text x="8" y="12" font-size="8" text-anchor="middle" fill="white">B</text>'
-              : ""
+    if (!vehicleId) return;
+    setConnectionStatus("Connecting to real-time data...");
+    setIsLoading(true);
+    setWsError("");
+    if (stompClientRef.current) {
+      stompClientRef.current.deactivate();
+    }
+    const socket = new SockJS('http://localhost:8080/ws');
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: () => {
+        setConnectionStatus("Connected to real-time data");
+        stompClient.subscribe('/topic/vehicle', (message) => {
+          try {
+            console.log("WebSocket init message:", message);
+            const data = JSON.parse(message.body);
+            if (data.vehicleId === vehicleId) {
+              // Process bus update
+              const now = new Date(data.timestamp || Date.now());
+              setLastUpdated(now);
+              // Find nearest stop
+              let nearestStopIndex = currentStopIndex;
+              let minDistance = Infinity;
+              let atStop = false;
+              stops.forEach((stop, index) => {
+                const distance = calculateDistance(
+                  stop.latitude, stop.longitude,
+                  data.latitude, data.longitude
+                );
+                if (distance < minDistance) {
+                  minDistance = distance;
+                  nearestStopIndex = index;
+                  atStop = distance < NEAR_STOP_THRESHOLD;
+                }
+              });
+              if (minDistance < STOP_HIGHLIGHT_THRESHOLD && nearestStopIndex !== currentStopIndex) {
+                setCurrentStopIndex(nearestStopIndex);
+              }
+              // Calculate ETA
+              let calculatedEta = null;
+              if (nearestStopIndex < stops.length - 1 && minDistance > NEAR_STOP_THRESHOLD) {
+                const nextStop = stops[nearestStopIndex + 1];
+                const distance = calculateDistance(
+                  data.latitude, data.longitude,
+                  nextStop.latitude, nextStop.longitude
+                );
+                const speed = data.speed || 30;
+                calculatedEta = Math.ceil((distance / speed) * 60);
+              }
+              setEta(calculatedEta);
+              setBusLocation({
+                latitude: data.latitude,
+                longitude: data.longitude,
+                stopName: stops[nearestStopIndex]?.stopName || "In Transit",
+                status: atStop ? "at stop" : "moving",
+                speed: `${(data.speed || 0).toFixed(1)} km/h`,
+                heading: data.heading || "N",
+                nextStop: stops[nearestStopIndex + 1]?.stopName || "End of Route",
+              });
+            }
+          } catch (error) {
+            setWsError("Error processing WebSocket data.");
+          } finally {
+            setIsLoading(false);
           }
-        </svg>`,
-        iconSize: [22, 22],
-        iconAnchor: [11, 11],
-      });
+        });
+        stompClient.publish({
+          destination: '/app/subscribeVehicle',
+          body: JSON.stringify({ vehicleId }), // sends { "vehicleId": "BUS123" }
+          headers: { 'content-type': 'application/json' }
+        });
 
-      marker.setIcon(icon);
-      marker.unbindTooltip();
-      marker.bindTooltip(
-        `${stops[idx].stopName}${isCurrent ? " (Current)" : isNext ? " (Next)" : ""}`,
-        { permanent: false, direction: "top" }
-      );
+      },
+      onStompError: (frame) => {
+        setConnectionStatus("Connection error");
+        setWsError("WebSocket connection error.");
+      },
+      onDisconnect: () => {
+        setConnectionStatus("Disconnected, reconnecting...");
+      },
     });
-  }, [currentStopIndex, stops]);
-
-  // Initial data fetch
-  useEffect(() => {
-    fetchStops();
-  }, [fetchStops]);
+    stompClient.activate();
+    stompClientRef.current = stompClient;
+    return () => {
+      if (stompClientRef.current) {
+        stompClientRef.current.deactivate();
+      }
+    };
+    // eslint-disable-next-line
+  }, [vehicleId]);
 
   // Format time
   const formatTimestamp = (timestamp) => {
@@ -409,7 +326,7 @@ const BusTracker = () => {
 
   return (
     <>
-      <style>{`
+     <style>{`
         .bustracker-layout {
           display: flex;
           min-height: 100vh;
@@ -417,7 +334,7 @@ const BusTracker = () => {
         }
         .bustracker-main {
           flex: 1;
-          margin-left: ${SIDEBAR_WIDTH}px;
+         
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -577,8 +494,8 @@ const BusTracker = () => {
           }
         }
       `}</style>
+      <Nav />
       <div className="bustracker-layout">
-        <Nav />
         <div className="bustracker-main">
           {/* Status Bar */}
           <div className="bustracker-statusbar">
@@ -607,11 +524,13 @@ const BusTracker = () => {
           {/* Connection Status */}
           <div className="connection-status">
             Status: {connectionStatus}
+            {osrmError && <span style={{ color: "#b91c1c", marginLeft: 10 }}>{osrmError}</span>}
+            {wsError && <span style={{ color: "#b91c1c", marginLeft: 10 }}>{wsError}</span>}
           </div>
 
           {/* Map Section */}
           <div className="bustracker-map-section">
-            <div id="bus-map"></div>
+            <div id="bus-map" style={{ width: "100%", height: "420px" }}></div>
           </div>
 
           {/* Details Section */}
@@ -623,7 +542,6 @@ const BusTracker = () => {
                   const isCurrent = idx === currentStopIndex;
                   const isNext = idx === currentStopIndex + 1;
                   const isPassed = idx < currentStopIndex;
-                  
                   return (
                     <div
                       key={stop.stopId}

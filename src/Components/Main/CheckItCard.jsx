@@ -180,9 +180,7 @@ const CheckItCard = ({
       }
     `}</style>
     <div className="checkit-bg">
-      <div className="checkit-navbar-space">
-        <Navbar />
-      </div>
+      
       <div className="checkit-card-outer">
         <div className="checkit-card">
           <div className="checkit-chip">

@@ -20,26 +20,21 @@ const Home = () => {
   return (
     <>
       <style>{`
-        .home-bg {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          background: #f3f4f6;
-        }
-        .home-main {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 0rem;
+     
+        // .home-main {
+        //   flex: 1;
+        //   display: flex;
+        //   flex-direction: column;
+        //   align-items: center;
+        //   justify-content: center;
+        //   padding: 0rem;
           
-        }
+        // }
         .home-card-container {
         max-width: 1200px;
        margin: 0.2rem 0.4rem 0.5rem 0.4rem;
         position: relative;
-        
+         box-sizing: border-box;
       }
 
         .home-sep-bar {
@@ -69,13 +64,7 @@ const Home = () => {
           margin-left: 0rem;
           background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
         }
-        @media (max-width: 1050px) {
-          .home-card {
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            padding: 1.2rem 0.7rem;
-          }
-        }
+       
         .home-img {
           border-radius: 1rem;
           box-shadow: 0 4px 16px rgba(22,163,74,0.13);
@@ -89,12 +78,14 @@ const Home = () => {
           font-weight: 700;
           color: #166534;
           margin-bottom: 1rem;
+          text-align: center;
         }
         .home-why-list {
           list-style: disc inside;
           color: #374151;
-          font-size: 1.15rem;
-          margin-left: 0.5rem;
+          font-size: 1.5vw;         /* Responsive font size */
+          padding-left: 4vw;        /* Responsive left padding */
+          margin-left: 0; 
         }
         .home-main-title {
           font-size: 4rem;
@@ -154,9 +145,29 @@ const Home = () => {
         .home-btn-user:hover {
           background: linear-gradient(90deg, #16a34a 60%, #15803d 100%);
         }
+           @media (max-width: 900px) {
+          .home-card {
+            grid-template-columns: 1fr;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 2rem;
+           
+
+          }
+           
+          .home-main-title {
+            font-size: 3rem;
+            text-align: center;
+
+           }
+            .home-why-list {
+            padding-left: 5rem;
+      }
+           
+        }
       `}</style>
-      <div className="home-bg">
-        <main className="home-main">
+      <>
+
           <div className="home-card-container">
             <div className="home-sep-bar"></div>
             <div className="home-card">
@@ -210,10 +221,10 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </main>
+       
         {/* Footer */}
 
-      </div>
+      </>
     </>
   );
 };

@@ -119,14 +119,9 @@ const RouteInfo = () => {
   return (
     <>
       <style>{`
-        .routeinfo-layout {
-          display: flex;
-          min-height: 100vh;
-          background: #f3f4f6;
-        }
+      
         .routeinfo-main {
       
-          
           border-radius: 2rem;             /* Tailwind: rounded-2xl = 1rem (16px) */
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Tailwind: shadow-2xl */
           padding: 1.5rem;                 /* Tailwind: p-6 = 1.5rem */
@@ -154,14 +149,17 @@ const RouteInfo = () => {
           margin-bottom: 1.5rem;
         }
         .routeinfo-card {
-          background: #fff;
-          border-radius: 1.2rem;
-          box-shadow: 0 2px 12px rgba(22,163,74,0.08);
-          padding: 2rem 1.5rem 2.5rem 1.5rem;
-          margin-top: 2rem;
-          width: 100%;
-          max-width: 800px;
-          margin-left: 7rem;
+ background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 12px rgba(22,163,74,0.08);
+  padding: 2rem 1.5rem 2.5rem 1.5rem;
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 800px;
+  box-sizing: border-box;
+  margin-left: auto;   /* Add this */
+  margin-right: auto; 
+    
         }
         .routeinfo-section-title {
           font-size: 1.2rem;
@@ -264,12 +262,18 @@ const RouteInfo = () => {
         }
         @media (max-width: 900px) {
           .routeinfo-main {
-            margin-left: 0;
-            padding: 1rem 0.2rem;
-          }
-          .routeinfo-card {
-            padding: 1rem 0.7rem 1.5rem 0.7rem;
-          }
+          margin-left: 0;
+          padding: 1rem 0.2rem;
+          align-items: center;
+        }
+         .routeinfo-card {
+          padding: 1rem 0.5rem 1.5rem 0.5rem;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
+          margin-left: auto;   /* Keep this for centering */
+          margin-right: auto;  /* Keep this for centering */
+        }
         }
       `}</style>
       

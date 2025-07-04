@@ -7,50 +7,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import Navbar from "../Main/Navbar";
+
 const stompClientRef = React.createRef();
 
 const SIDEBAR_WIDTH = 220;
 
-// --- Utility functions for speed and direction ---
-function haversineDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Earth radius in km
-  const toRad = deg => deg * Math.PI / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-function calculateSpeed(prev, curr) {
-  const distance = haversineDistance(prev.lat, prev.lon, curr.lat, curr.lon); // in km
-  const timeDiff = (curr.timestamp - prev.timestamp) / 3600000; // ms to hours
-  return timeDiff > 0 ? distance / timeDiff : 0; // km/h
-}
-
-function calculateBearing(lat1, lon1, lat2, lon2) {
-  const toRad = deg => deg * Math.PI / 180;
-  const toDeg = rad => rad * 180 / Math.PI;
-  const dLon = toRad(lon2 - lon1);
-  const y = Math.sin(dLon) * Math.cos(toRad(lat2));
-  const x =
-    Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
-    Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
-  let brng = Math.atan2(y, x);
-  brng = toDeg(brng);
-  return (brng + 360) % 360; // in degrees
-}
-
-function bearingToDirection(bearing) {
-  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
-  return directions[Math.round(bearing / 45)];
-}
-
-// --- Main Component ---
 const ViewDetails = () => {
   // State management
   const [stops, setStops] = useState([]);
@@ -137,14 +98,15 @@ const ViewDetails = () => {
     setLoadingStates(prev => ({ ...prev, isSearching: true }));
 
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/vehicle/stopTimes/routes/${
-          encodeURIComponent(searchQueries.source)
-        }/${
-          encodeURIComponent(searchQueries.destination)
-        }`,
-        { withCredentials: true }
-      );
+   const response = await axios.get(
+  `http://localhost:8080/api/vehicle/stopTimes/routes`, {
+    params: {
+      sourceStop: searchQueries.source,
+      destinationStop: searchQueries.destination,
+    },
+    withCredentials: true
+  }
+);
       const routes = response.data || [];
       setCommonRoutes(routes);
       setConnectionStatus(prev => ({ ...prev, hasWebSocketData: routes.length > 0 }));
@@ -214,39 +176,6 @@ const ViewDetails = () => {
   }, [busData]);
 
   // --- Calculate speed and direction for each bus ---
-  const busesWithSpeedDirection = useMemo(() => {
-    return latestBusData.map(bus => {
-      const prev = prevBusPositions.current[bus.vehicleId];
-      let speed = 0;
-      let heading = "N/A";
-      if (
-        prev &&
-        prev.lat !== undefined &&
-        prev.lon !== undefined &&
-        prev.timestamp !== undefined &&
-        bus.lat !== undefined &&
-        bus.lon !== undefined &&
-        bus.timestamp !== undefined &&
-        bus.timestamp !== prev.timestamp
-      ) {
-        speed = calculateSpeed(prev, bus);
-        const bearing = calculateBearing(prev.lat, prev.lon, bus.lat, bus.lon);
-        heading = bearingToDirection(bearing);
-      }
-      // Update previous position for next calculation
-      prevBusPositions.current[bus.vehicleId] = {
-        lat: bus.lat,
-        lon: bus.lon,
-        timestamp: bus.timestamp
-      };
-      return {
-        ...bus,
-        speed: speed ? speed.toFixed(2) : 0,
-        heading
-      };
-    });
-  // eslint-disable-next-line
-  }, [latestBusData]);
 
   // Loading state conditions
   const showLoading = useMemo(() => {
@@ -351,21 +280,21 @@ const ViewDetails = () => {
                 onFindBuses={handleFindBuses}
               />
               <ActionButtons />
-              {showLoading ? (
-                <LoadingState
-                  isSearching={loadingStates.isSearching}
-                  queries={searchQueries}
-                />
-              ) : busesWithSpeedDirection.length > 0 ? (
-                <BusCardsContainer
-                  buses={busesWithSpeedDirection}
-                  onBusClick={handleBusCardClick}
-                />
-              ) : (
-                <NoBusesAvailable
-                  destinationSelected={!!selectedStopIds.destination}
-                />
-              )}
+          {showLoading ? (
+  <LoadingState
+    isSearching={loadingStates.isSearching}
+    queries={searchQueries}
+  />
+) : latestBusData.length > 0 ? (
+  <BusCardsContainer
+    buses={latestBusData}
+    onBusClick={handleBusCardClick}
+  />
+) : (
+  <NoBusesAvailable
+    destinationSelected={!!selectedStopIds.destination}
+  />
+)}
             </div>
     
     </>
@@ -493,17 +422,17 @@ const BusCard = React.memo(({ bus, onClick }) => (
         <StatItem
           icon={<FaTachometerAlt className="text-green-500 text-lg" />}
           label="Speed"
-          value={`${bus.speed || 0} km/h`}
+          value={`${bus.speed ? bus.speed.toFixed(2) : 0} km/h`}
         />
         <StatItem
           icon={<FaCompass className="text-blue-500 text-lg" />}
           label="Direction"
-          value={bus.heading || "N/A"}
+          value={bus.direction || "N/A"}
         />
         <StatItem
           icon={<FaMapMarkerAlt className="text-red-500 text-lg" />}
-          label="Location"
-          value={bus.location || "N/A"}
+          label="Next StopId"
+          value={`No. ${bus.nextStopId}` || "N/A"}
           truncate
         />
         <StatItem
@@ -513,21 +442,18 @@ const BusCard = React.memo(({ bus, onClick }) => (
         />
       </div>
 
-      {bus.eta !== undefined && (
-        <div className="bg-blue-100 rounded-md px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="text-base font-semibold text-blue-800">ETA:</span>
-            <span className={`text-lg font-bold ${
-              bus.eta === 0 ? "text-green-600" : "text-blue-700"
-            }`}>
-              {bus.eta === 0 ? "Arrived" : `${bus.eta} min`}
-            </span>
-          </div>
-          <span className="text-sm font-medium text-blue-700">
-            {bus.timestamp ? new Date(bus.timestamp).toLocaleTimeString() : "--:--"}
-          </span>
-        </div>
-      )}
+ {bus.nextStopName&& (
+  <div className="bg-blue-100 rounded-md px-4 py-2 flex items-center justify-between">
+    <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4">
+      <span className="text-base font-semibold text-blue-800">
+        Next Stop:
+      </span>
+      <span className="text-lg font-bold text-blue-700">
+        {bus.nextStopName}
+      </span>
+    </div>
+  </div>
+)}
     </div>
   </motion.div>
 ));

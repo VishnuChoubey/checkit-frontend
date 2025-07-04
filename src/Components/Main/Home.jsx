@@ -154,7 +154,6 @@ const Home = () => {
 /* Tablet */
 @media (max-width: 900px) {
   .home-card {
-    grid-template-columns: 1fr;
     gap: 2rem;
   }
 

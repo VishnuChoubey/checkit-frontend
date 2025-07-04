@@ -157,7 +157,7 @@ const Home = () => {
 
            }
             .home-why-list {
-            padding-left: 5rem;
+            font-size: 2.2rem;
       }
            
         }

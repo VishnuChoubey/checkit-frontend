@@ -11,9 +11,9 @@ const Registration = () => {
     licenseNumber: "",
     licenseExpiry: "",
     address: "",
-    // experience: "",
-    // emergencyName: "",
-    // emergencyRelationship: "",
+    experience: "",
+    emergencyName: "",
+    emergencyRelationship: "",
     emergencyPhone: "",
     password: "",
     confirmPassword: "",
@@ -91,24 +91,28 @@ const Registration = () => {
     setError(""); // Clear errors
 
     // Prepare FormData for file upload
-    const registerForm = new FormData();
-    registerForm.append("name", name);
-    registerForm.append("email", email);
-    registerForm.append("phone", phone);
-    registerForm.append("licenseNumber", licenseNumber);
-    registerForm.append(
-  "licenseExpiry",
-  licenseExpiry ? licenseExpiry.toISOString() : ""
-);
-    registerForm.append("address", address);
-    registerForm.append("experience", experience);
-    registerForm.append("emergencyName", emergencyName);
-    registerForm.append("emergencyRelationship", emergencyRelationship);
-    registerForm.append("emergencyPhone", emergencyPhone);
-    registerForm.append("password", password);
-    if (photo) {
-      registerForm.append("photo", photo);
-    }
+   const registerForm = new FormData();
+
+        const jsonPayload = {
+          name,
+          email,
+          phone,
+          licenseNumber,
+          licenseExpiry: licenseExpiry ? licenseExpiry.toISOString().split("T")[0] : "",
+          address,
+          experience,
+          emergencyName,
+          emergencyRelationship,
+          emergencyPhone,
+          password,
+        };
+
+        registerForm.append("request", new Blob([JSON.stringify(jsonPayload)], { type: "application/json" }));
+
+        if (photo) {
+          registerForm.append("photo", photo);
+        }
+
 
     try {
 

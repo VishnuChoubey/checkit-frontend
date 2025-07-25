@@ -36,7 +36,7 @@ const Login = () => {
     setError(""); // Clear errors
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/authenticate", {
+      const response = await fetch("http://localhost:8080/api/auth/authenticateDriver", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

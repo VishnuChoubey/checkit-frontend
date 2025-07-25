@@ -58,7 +58,9 @@ const DriverProfile = () => {
         updateForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log(res.data);
       setDriver(res.data);
+      console.log(res.data);
       setIsEditing(false);
     } catch (err) {
       alert("Failed to update profile.");
@@ -314,15 +316,15 @@ const DriverProfile = () => {
             <div className="profile-photo">
               <img
                 src={
-                  driver.photoUrl
-                    ? driver.photoUrl
+                  driver.photo
+                    ? driver.photo
                     : "/images/profiles/default-driver.jpg"
                 }
-                alt={driver.name}
-                onError={e => {
-                  e.target.onerror = null;
-                  e.target.src = '/images/profiles/default-driver.jpg'
-                }}
+                // alt={driver.name}
+                // onError={e => {
+                //   e.target.onerror = null;
+                //   e.target.src = '/images/profiles/default-driver.jpg'
+                // }}
               />
               {isEditing && (
                 <input

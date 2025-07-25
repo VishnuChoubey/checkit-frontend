@@ -54,7 +54,7 @@ const Home = () => {
           margin-bottom: 0.5rem;
           margin-left: 0rem;
           background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
-         box-shadow: 2px 4px 16px rgba(22, 163, 74, 0.15);
+         box-shadow: 2px 4px 16px #16a34a;
          
           
         }
@@ -62,7 +62,10 @@ const Home = () => {
         .home-img {
           border-radius: 1rem;
           box-shadow: 0 4px 16px rgba(22,163,74,0.13);
-          max-width: 400px;
+       
+           width:370px;
+           height:275px;
+           filter:blur(0.5px) brightness(120%);
           border: 4px solid #166534;
           margin: 0 auto;
           display: block;
@@ -146,10 +149,14 @@ const Home = () => {
     gap: 2rem;
     padding: 1.5rem;
   }
+    .home-card .why-checkit{
+    display:none;
+    }
 
   .home-img {
     max-width: 100%;
-    width: 100%;
+    width: 90%;
+    height:220px;
     margin: 0 auto;
   }
 
@@ -195,10 +202,11 @@ const Home = () => {
                   <img
                     className="home-img"
                     alt="Delhi Bus Travel"
-                    src="https://th.bing.com/th/id/OIP.3wUDnBXkPJCzBzTkrV2ZZgHaET?w=550&h=280&c=7&r=0&o=5&dpr=1.5&pid=1.7"
+                    // src="https://th.bing.com/th/id/OIP.3wUDnBXkPJCzBzTkrV2ZZgHaET?w=550&h=280&c=7&r=0&o=5&dpr=1.5&pid=1.7"
+                    src="/images/buspic.jpeg"
                   />
                 </div>
-                <div>
+                <div className="why-checkit">
                   <h3 className="home-why-title">Why Choose Check It?</h3>
                   <ul className="home-why-list">
                     <li>Find the fastest and most convenient routes.</li>

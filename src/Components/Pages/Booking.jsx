@@ -139,11 +139,16 @@ const Booking = () => {
       setError("");
       setLoadingRoutes(true);
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/vehicle/stopTimes/routes/${encodeURIComponent(
-            form.source
-          )}/${encodeURIComponent(form.destination)}`
-        );
+       const response = await axios.get(
+        `http://localhost:8080/api/vehicle/stopTimes/routes`, {
+          params: {
+            sourceStop: form.source,
+            destinationStop: form.destination,
+          },
+          withCredentials: true
+        }
+      );
+
         setRoutes(response.data || []);
         if (!response.data?.length) {
           setError("No routes found between these stops.");

@@ -33,6 +33,19 @@ const BusTracker = () => {
   const [osrmError, setOsrmError] = useState("");
   const [wsError, setWsError] = useState("");
 
+  // Calculate distance between two points in km
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }, []);
+
   // Fetch stops sequence for the route
   useEffect(() => {
     let cancelled = false;
@@ -56,7 +69,42 @@ const BusTracker = () => {
           }
           setStops(validStops);
           setConnectionStatus("Waiting for bus data...");
-          if (!busLocation && validStops.length > 0) {
+          // Set initial bus location from busData if available
+          if (!busLocation && busData && busData.latitude && busData.longitude) {
+            // Find nearest stop to initial bus location
+            let nearestStopIndex = 0;
+            let minDistance = Infinity;
+            validStops.forEach((stop, index) => {
+              const distance = calculateDistance(
+                stop.latitude, stop.longitude,
+                busData.latitude, busData.longitude
+              );
+              if (distance < minDistance) {
+                minDistance = distance;
+                nearestStopIndex = index;
+              }
+            });
+            setBusLocation({
+              latitude: busData.latitude,
+              longitude: busData.longitude,
+              stopName: validStops[nearestStopIndex]?.stopName || "In Transit",
+              status: "at stop",
+              speed: `${(busData.speed || 0).toFixed(1)} km/h`
+            });
+            setCurrentStopIndex(nearestStopIndex);
+            // Calculate ETA to next stop
+            if (validStops[nearestStopIndex + 1]) {
+              const nextStop = validStops[nearestStopIndex + 1];
+              const dist = calculateDistance(
+                busData.latitude, busData.longitude,
+                nextStop.latitude, nextStop.longitude
+              );
+              const speed = busData.speed || 30;
+              setEta(speed > 0 ? Math.ceil((dist / speed) * 60) : null);
+            } else {
+              setEta(null);
+            }
+          } else if (!busLocation && validStops.length > 0) {
             setBusLocation({
               latitude: validStops[0].latitude,
               longitude: validStops[0].longitude,
@@ -65,6 +113,7 @@ const BusTracker = () => {
               speed: "0 km/h"
             });
             setCurrentStopIndex(0);
+            setEta(null);
           }
         }
       } catch (error) {
@@ -75,7 +124,7 @@ const BusTracker = () => {
     fetchStops();
     return () => { cancelled = true; };
     // eslint-disable-next-line
-  }, [routeId, sourceStopId, destStopId]);
+  }, [routeId, sourceStopId, destStopId, busData, calculateDistance]);
 
   // Initialize map only once
   useEffect(() => {
@@ -105,7 +154,7 @@ const BusTracker = () => {
     };
   }, [stops]);
 
-  // Draw route polyline using OSRM (only once per stops change)
+  // Draw static route polyline using OSRM (once per stops change)
   useEffect(() => {
     if (!mapRef.current || stops.length < 2) return;
     setOsrmError("");
@@ -183,9 +232,11 @@ const BusTracker = () => {
     });
   }, [stops, currentStopIndex]);
 
-  // Add/update bus marker
+  // Add/update bus marker and center map on bus
   useEffect(() => {
     if (!mapRef.current || !busLocation) return;
+
+    // Update or create bus marker
     if (busMarkerRef.current) {
       busMarkerRef.current.setLatLng([busLocation.latitude, busLocation.longitude]);
     } else {
@@ -200,22 +251,9 @@ const BusTracker = () => {
         { icon: busIcon, title: `Bus (${busLocation.speed})` }
       ).addTo(mapRef.current);
     }
-    // Optionally center map on bus
-    // mapRef.current.setView([busLocation.latitude, busLocation.longitude]);
+    // Center map on bus location as it moves
+    mapRef.current.setView([busLocation.latitude, busLocation.longitude]);
   }, [busLocation]);
-
-  // Calculate distance between two points in km
-  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }, []);
 
   // WebSocket connection
   useEffect(() => {
@@ -236,52 +274,48 @@ const BusTracker = () => {
         setConnectionStatus("Connected to real-time data");
         stompClient.subscribe('/topic/vehicle', (message) => {
           try {
-            console.log("WebSocket init message:", message);
             const data = JSON.parse(message.body);
-            if (data.vehicleId === vehicleId) {
-              // Process bus update
-              const now = new Date(data.timestamp || Date.now());
-              setLastUpdated(now);
-              // Find nearest stop
-              let nearestStopIndex = currentStopIndex;
-              let minDistance = Infinity;
-              let atStop = false;
-              stops.forEach((stop, index) => {
-                const distance = calculateDistance(
-                  stop.latitude, stop.longitude,
-                  data.latitude, data.longitude
-                );
-                if (distance < minDistance) {
-                  minDistance = distance;
-                  nearestStopIndex = index;
-                  atStop = distance < NEAR_STOP_THRESHOLD;
-                }
-              });
-              if (minDistance < STOP_HIGHLIGHT_THRESHOLD && nearestStopIndex !== currentStopIndex) {
-                setCurrentStopIndex(nearestStopIndex);
+            // Find nearest stop
+            console.log("Received data:", data);
+            let nearestStopIndex = currentStopIndex;
+            let minDistance = Infinity;
+            let atStop = false;
+            stops.forEach((stop, index) => {
+              const distance = calculateDistance(
+                stop.latitude, stop.longitude,
+                data.latitude, data.longitude
+              );
+              if (distance < minDistance) {
+                minDistance = distance;
+                nearestStopIndex = index;
+                atStop = distance < NEAR_STOP_THRESHOLD;
               }
-              // Calculate ETA
-              let calculatedEta = null;
-              if (nearestStopIndex < stops.length - 1 && minDistance > NEAR_STOP_THRESHOLD) {
-                const nextStop = stops[nearestStopIndex + 1];
-                const distance = calculateDistance(
-                  data.latitude, data.longitude,
-                  nextStop.latitude, nextStop.longitude
-                );
-                const speed = data.speed || 30;
-                calculatedEta = Math.ceil((distance / speed) * 60);
-              }
-              setEta(calculatedEta);
-              setBusLocation({
-                latitude: data.latitude,
-                longitude: data.longitude,
-                stopName: stops[nearestStopIndex]?.stopName || "In Transit",
-                status: atStop ? "at stop" : "moving",
-                speed: `${(data.speed || 0).toFixed(1)} km/h`,
-                heading: data.heading || "N",
-                nextStop: stops[nearestStopIndex + 1]?.stopName || "End of Route",
-              });
+            });
+            if (minDistance < STOP_HIGHLIGHT_THRESHOLD && nearestStopIndex !== currentStopIndex) {
+              setCurrentStopIndex(nearestStopIndex);
             }
+            // Calculate ETA to next stop
+            if (stops[nearestStopIndex + 1]) {
+              const nextStop = stops[nearestStopIndex + 1];
+              const dist = calculateDistance(
+                data.latitude, data.longitude,
+                nextStop.latitude, nextStop.longitude
+              );
+              const speed = data.speed || 30;
+              setEta(speed > 0 ? Math.ceil((dist / speed) * 60) : null);
+            } else {
+              setEta(null);
+            }
+            setBusLocation({
+              latitude: data.latitude,
+              longitude: data.longitude,
+              stopName: stops[nearestStopIndex]?.stopName || "In Transit",
+              status: atStop ? "at stop" : "moving",
+              speed: `${(data.speed || 0).toFixed(1)} km/h`,
+              heading: data.heading || "N",
+              nextStop: stops[nearestStopIndex + 1]?.stopName || "End of Route",
+            });
+            setLastUpdated(new Date(data.timestamp || Date.now()));
           } catch (error) {
             setWsError("Error processing WebSocket data.");
           } finally {
@@ -290,7 +324,7 @@ const BusTracker = () => {
         });
         stompClient.publish({
           destination: '/app/subscribeVehicle',
-          body: JSON.stringify({ vehicleId }), // sends { "vehicleId": "BUS123" }
+          body: JSON.stringify({ vehicleId }),
           headers: { 'content-type': 'application/json' }
         });
 
@@ -311,7 +345,7 @@ const BusTracker = () => {
       }
     };
     // eslint-disable-next-line
-  }, [vehicleId]);
+  }, [vehicleId, stops, currentStopIndex, calculateDistance]);
 
   // Format time
   const formatTimestamp = (timestamp) => {
@@ -334,7 +368,6 @@ const BusTracker = () => {
         }
         .bustracker-main {
           flex: 1;
-         
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -468,6 +501,12 @@ const BusTracker = () => {
           font-size: 0.97rem;
           margin-left: 1.2rem;
         }
+        .bus-here-label {
+          font-size: 1.1rem;
+          font-weight: bold;
+          color: #2563eb;
+          margin-bottom: 0.2rem;
+        }
         .connection-status {
           padding: 0.5rem;
           border-radius: 0.5rem;
@@ -494,7 +533,6 @@ const BusTracker = () => {
           }
         }
       `}</style>
-      <Nav />
       <div className="bustracker-layout">
         <div className="bustracker-main">
           {/* Status Bar */}
@@ -543,24 +581,25 @@ const BusTracker = () => {
                   const isNext = idx === currentStopIndex + 1;
                   const isPassed = idx < currentStopIndex;
                   return (
-                    <div
-                      key={stop.stopId}
-                      className={`bustracker-stopitem ${isCurrent ? "current" : ""} ${isNext ? "next" : ""} ${isPassed ? "passed" : ""}`}
-                    >
-                      <div className="stop-index">{idx + 1}</div>
-                      <div className="stop-name">{stop.stopName}</div>
-                      <div className="stop-meta">Stop {stop.stopSequence}</div>
+                    <React.Fragment key={stop.stopId}>
                       {isCurrent && (
-                        <div className="eta ml-2 text-blue-700 font-bold">
-                          🚌 Bus is here
+                        <div className="bus-here-label">
+                          🚌 Bus is here (Lat: {busLocation?.latitude?.toFixed(5)}, Lng: {busLocation?.longitude?.toFixed(5)})
                         </div>
                       )}
-                      {isNext && eta && (
-                        <div className="eta">
-                          <FaClock className="inline mr-1" /> ETA: ~{eta} min
-                        </div>
-                      )}
-                    </div>
+                      <div
+                        className={`bustracker-stopitem ${isCurrent ? "current" : ""} ${isNext ? "next" : ""} ${isPassed ? "passed" : ""}`}
+                      >
+                        <div className="stop-index">{idx + 1}</div>
+                        <div className="stop-name">{stop.stopName}</div>
+                        <div className="stop-meta">Stop {stop.stopSequence}</div>
+                        {isNext && eta && (
+                          <div className="eta">
+                            <FaClock className="inline mr-1" /> ETA: ~{eta} min
+                          </div>
+                        )}
+                      </div>
+                    </React.Fragment>
                   );
                 })}
               </div>

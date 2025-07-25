@@ -13,8 +13,9 @@ const menuItems = [
 ];
 
 const Navbar = ({ navOpen, setNavOpen, windowWidth }) => {
-const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [role, setRole] = useState("user");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,11 +32,10 @@ const [profile, setProfile] = useState(null);
     }
   }, [navOpen, windowWidth, setNavOpen]);
 
-
   useEffect(() => {
     const fetchProfile = async () => {
       setLoadingProfile(true);
-    
+
       const token = localStorage.getItem("accessToken");
       if (!token) {
         setProfile(null);
@@ -43,16 +43,26 @@ const [profile, setProfile] = useState(null);
         return;
       }
       try {
-        const response = await fetch("http://localhost:8080/api/user/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        // Try user profile first
+        let response = await fetch("http://localhost:8080/api/user/profile", {
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
           const data = await response.json();
           setProfile(data);
+          setRole("user");
         } else {
-          setProfile(null);
+          // If not user, try driver profile
+          response = await fetch("http://localhost:8080/api/driver/profile", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setProfile(data);
+            setRole("driver");
+          } else {
+            setProfile(null);
+          }
         }
       } catch (err) {
         setProfile(null);
@@ -69,7 +79,6 @@ const [profile, setProfile] = useState(null);
     setLoadingProfile(false);
     navigate("/LoginUser");
   };
-
 
   return (
     <>
@@ -89,14 +98,12 @@ const [profile, setProfile] = useState(null);
           box-shadow: ${navOpen && windowWidth <= 1024 ? '2px 0 10px rgba(0,0,0,0.2)' : 'none'};
           border-radius: 1rem;
         }
-        
         .sidebar-navbar .user-info {
           display: flex;
           flex-direction: column;
           align-items: center;
           padding: 2rem 1rem 1.5rem;
         }
-        
         .sidebar-navbar .user-photo {
           width: 60px;
           height: 60px;
@@ -107,7 +114,6 @@ const [profile, setProfile] = useState(null);
           margin-bottom: 0.7rem;
           background: #e5e7eb;
         }
-        
         .sidebar-navbar .user-name {
           font-size: 1.08rem;
           font-weight: 700;
@@ -120,7 +126,6 @@ const [profile, setProfile] = useState(null);
           display: block;
           text-align: center;
         }
-        
         .sidebar-navbar ul {
           list-style: none;
           margin: 0;
@@ -129,11 +134,9 @@ const [profile, setProfile] = useState(null);
           display: flex;
           flex-direction: column;
         }
-        
         .sidebar-navbar li {
           margin-bottom: 0.5rem;
         }
-        
         .sidebar-navbar .nav-link {
           display: flex;
           align-items: center;
@@ -145,16 +148,13 @@ const [profile, setProfile] = useState(null);
           font-size: 1rem;
           transition: background 0.2s;
         }
-        
         .sidebar-navbar .nav-link.active,
         .sidebar-navbar .nav-link:focus {
           background: #166534;
         }
-        
         .sidebar-navbar .nav-link:hover {
           background: #15803d;
         }
-        
         .sidebar-navbar .logout-btn {
           width: 90%;
           margin: 1rem auto;
@@ -168,12 +168,10 @@ const [profile, setProfile] = useState(null);
           cursor: pointer;
           transition: background 0.2s;
         }
-        
         .sidebar-navbar .logout-btn:hover {
           background: #b91c1c;
         }
-        
-         .mobile-nav-toggle {
+        .mobile-nav-toggle {
           display: ${windowWidth <= 1024 ? 'flex' : 'none'};
           position: fixed;
           top: 1rem;
@@ -190,7 +188,7 @@ const [profile, setProfile] = useState(null);
           cursor: pointer;
           color: #16a34a;
         }
-           .close-sidebar {
+        .close-sidebar {
           display: ${windowWidth <= 1024 && navOpen ? 'block' : 'none'};
           position: absolute;
           top: 1rem;
@@ -202,35 +200,29 @@ const [profile, setProfile] = useState(null);
           cursor: pointer;
           z-index: 1001;
         }
-           @media (max-width: 768px) {
+        @media (max-width: 768px) {
           .sidebar-navbar {
             width: 60vw;
           }
         }
-       
-          
-          .sidebar-navbar .user-info {
-            padding: 1.5rem 1rem;
-          }
-          
-          .sidebar-navbar .user-photo {
-            width: 50px;
-            height: 50px;
-          }
+        .sidebar-navbar .user-info {
+          padding: 1.5rem 1rem;
+        }
+        .sidebar-navbar .user-photo {
+          width: 50px;
+          height: 50px;
         }
       `}</style>
-      
-    {windowWidth <= 1024 && !navOpen && (
-  <button
-    className="mobile-nav-toggle"
-    onClick={() => setNavOpen(true)}
-    aria-label="Toggle navigation"
-  >
-    <FaBars />
-  </button>
-)}
-      
-       <nav className="sidebar-navbar">
+      {windowWidth <= 1024 && !navOpen && (
+        <button
+          className="mobile-nav-toggle"
+          onClick={() => setNavOpen(true)}
+          aria-label="Toggle navigation"
+        >
+          <FaBars />
+        </button>
+      )}
+      <nav className="sidebar-navbar">
         <button 
           className="close-sidebar" 
           onClick={() => setNavOpen(false)}
@@ -248,7 +240,7 @@ const [profile, setProfile] = useState(null);
               />
               <span style={{ color: "#fff", fontWeight: 600 }}>Loading...</span>
             </>
-          ) : !profile || !profile.profilePictureUrl || !profile.name ? (
+          ) : !profile ? (
             <>
               <img
                 src="https://ui-avatars.com/api/?name=User"
@@ -260,12 +252,12 @@ const [profile, setProfile] = useState(null);
                 <button className="logout-btn" onClick={handleLogout}>Logout</button>
               )}
             </>
-          ) : (
+          ) : role === "user" ? (
             <>
               <img
                 src={
                   profile.profilePictureUrl
-                    ? `http://localhost:8080${profile.profilePictureUrl}`
+                    ? profile.profilePictureUrl
                     : "https://ui-avatars.com/api/?name=User"
                 }
                 alt={profile.name || "User"}
@@ -279,10 +271,31 @@ const [profile, setProfile] = useState(null);
                 <button className="logout-btn" onClick={handleLogout}>Logout</button>
               )}
             </>
+          ) : (
+            <>
+              <img
+                src={
+                  profile.photo
+                    ? profile.photo
+                    : "https://ui-avatars.com/api/?name=Driver"
+                }
+                alt={profile.name || "Driver"}
+                className="user-photo"
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate("/driverprofile")}
+                onError={e => { e.target.onerror = null; e.target.src = "https://ui-avatars.com/api/?name=Driver"; }}
+              />
+              <span className="user-name" title={profile.name}>{profile.name || "Driver"}</span>
+              <span style={{ color: "#bbf7d0", fontSize: "0.95rem" }}>
+                {profile.role || "Driver"}
+              </span>
+              {localStorage.getItem("accessToken") && (
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+              )}
+            </>
           )}
         </div>
-        
-          <ul>
+        <ul>
           {menuItems.map((item, idx) => (
             <li key={idx}>
               <NavLink

@@ -86,7 +86,7 @@ const PassengerDashboard = () => {
 
   return (
     <>
-      <Navbar />
+     
      <style>{`
         .passenger-container {
         background:linear-gradient(90deg, #d1fae5 60%, #86efac 100%);
@@ -100,6 +100,7 @@ const PassengerDashboard = () => {
           padding-left: 2rem;
           padding-right: 0px;
           display: flex;
+          flex-direction: column;
         }
         .passenger-header {
         background: #f0fdf4;
@@ -324,15 +325,16 @@ const PassengerDashboard = () => {
               <div className="profile-error">{profileError}</div>
             ) : profile ? (
               <>
-                <img
-                  className="profile-picture"
-                  src={
-                    profile.profilePictureUrl
-                      ? `http://localhost:8080${profile.profilePictureUrl}`
-                      : "https://ui-avatars.com/api/?name=" + encodeURIComponent(profile.name || "User")
-                  }
-                  alt="Profile"
-                />
+               <img
+  className="profile-picture"
+  src={
+    profile.profilePictureUrl
+      ? profile.profilePictureUrl
+      : "https://ui-avatars.com/api/?name=" + encodeURIComponent(profile.name || "User")
+  }
+  alt="Profile"
+/>
+
                 <div className="profile-details">
                   <span className="profile-name">{profile.name}</span>
                   <span className="profile-email">{profile.email}</span>

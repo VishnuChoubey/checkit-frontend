@@ -44,7 +44,7 @@ const Navbar = ({ navOpen, setNavOpen, windowWidth }) => {
       }
       try {
         // Try user profile first
-        let response = await fetch("http://localhost:8080/api/user/profile", {
+        let response = await fetch(`${process.env.REACT_APP_API_BASE}/api/user/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (response.ok) {
@@ -53,7 +53,7 @@ const Navbar = ({ navOpen, setNavOpen, windowWidth }) => {
           setRole("user");
         } else {
           // If not user, try driver profile
-          response = await fetch("http://localhost:8080/api/driver/profile", {
+          response = await fetch(`${process.env.REACT_APP_API_BASE}/api/driver/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (response.ok) {

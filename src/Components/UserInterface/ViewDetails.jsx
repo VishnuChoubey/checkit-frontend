@@ -63,7 +63,7 @@ const ViewDetails = () => {
     if (stompClientRef.current) {
       stompClientRef.current.deactivate();
     }
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS(`${process.env.REACT_APP_API_BASE}/ws`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
@@ -99,7 +99,7 @@ const ViewDetails = () => {
 
     try {
    const response = await axios.get(
-  `http://localhost:8080/api/vehicle/stopTimes/routes`, {
+  `${process.env.REACT_APP_API_BASE}/api/vehicle/stopTimes/routes`, {
     params: {
       sourceStop: searchQueries.source,
       destinationStop: searchQueries.destination,

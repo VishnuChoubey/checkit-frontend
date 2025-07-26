@@ -54,7 +54,7 @@ const BusTracker = () => {
       setConnectionStatus("Loading stops...");
       setIsLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8080/api/vehicle/by-trip/${routeId}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE}/api/vehicle/by-trip/${routeId}`);
         if (cancelled) return;
         if (response.data && Array.isArray(response.data)) {
           let validStops = response.data
@@ -264,7 +264,7 @@ const BusTracker = () => {
     if (stompClientRef.current) {
       stompClientRef.current.deactivate();
     }
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS(`${process.env.REACT_APP_API_BASE}/ws`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,

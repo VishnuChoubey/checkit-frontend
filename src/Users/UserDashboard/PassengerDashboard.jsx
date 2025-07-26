@@ -17,7 +17,7 @@ const PassengerDashboard = () => {
       setProfileError("");
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await fetch("http://localhost:8080/api/user/profile", {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/user/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -44,7 +44,7 @@ const PassengerDashboard = () => {
       try {
         const token = localStorage.getItem("accessToken");
         const response = await fetch(
-          `http://localhost:8080/api/user/bookings/${profile.id}`,
+          `${process.env.REACT_APP_API_BASE}/api/user/bookings/${profile.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

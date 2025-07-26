@@ -11,7 +11,7 @@ const DriverProfile = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("accessToken");
-        const res = await axios.get("http://localhost:8080/api/driver/profile", {
+        const res = await axios.get(`${process.env.REACT_APP_API_BASE}/api/driver/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setDriver(res.data);
@@ -54,7 +54,7 @@ const DriverProfile = () => {
       });
       const token = localStorage.getItem("accessToken");
       const res = await axios.put(
-        "http://localhost:8080/api/driver/profile",
+        `${process.env.REACT_APP_API_BASE}/api/driver/profile`,
         updateForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );

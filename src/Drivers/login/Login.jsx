@@ -14,7 +14,7 @@ const Login = () => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+       [name]: name === "email" ? value.toLowerCase() : value,
     }));
   };
 
@@ -36,7 +36,7 @@ const Login = () => {
     setError(""); // Clear errors
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/authenticateDriver", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/auth/authenticateDriver`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

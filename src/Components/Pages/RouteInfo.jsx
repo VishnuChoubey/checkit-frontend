@@ -80,7 +80,7 @@ const RouteInfo = () => {
     }
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/vehicle/stopTimes/routes/${encodeURIComponent(
+        `${process.env.REACT_APP_API_BASE}/api/vehicle/stopTimes/routes/${encodeURIComponent(
           source
         )}/${encodeURIComponent(destination)}`
       );
@@ -104,7 +104,7 @@ const RouteInfo = () => {
     }
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/vehicle/by-trip/${encodeURIComponent(routeNo)}`
+        `${process.env.REACT_APP_API_BASE}/api/vehicle/by-trip/${encodeURIComponent(routeNo)}`
       );
       let validStops = response.data
         .filter((stop) => stop.latitude && stop.longitude)

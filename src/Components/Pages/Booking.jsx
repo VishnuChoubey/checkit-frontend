@@ -140,7 +140,7 @@ const Booking = () => {
       setLoadingRoutes(true);
       try {
        const response = await axios.get(
-        `http://localhost:8080/api/vehicle/stopTimes/routes`, {
+        `${process.env.REACT_APP_API_BASE}/api/vehicle/stopTimes/routes`, {
           params: {
             sourceStop: form.source,
             destinationStop: form.destination,
@@ -173,7 +173,7 @@ const Booking = () => {
       setLoadingFare(true);
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/vehicle/by-trip/${encodeURIComponent(
+          `${process.env.REACT_APP_API_BASE}/api/vehicle/by-trip/${encodeURIComponent(
             form.routeNo
           )}`
         );
@@ -245,7 +245,7 @@ const Booking = () => {
     try {
       // Create order on backend
       const { data: order } = await axios.post(
-        `http://localhost:8080/api/payment/create-order`,
+        `${process.env.REACT_APP_API_BASE}/api/payment/create-order`,
         {
           amount: amount * 100, // paise
           currency: "INR",
@@ -271,7 +271,7 @@ const Booking = () => {
             console.log("this is the user",user.id)
             // Verify payment on backend, include user info
             const { data } = await axios.post(
-              `http://localhost:8080/api/payment/verify`,
+              `${process.env.REACT_APP_API_BASE}/api/payment/verify`,
               {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,

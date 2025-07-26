@@ -11,10 +11,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+    [name]: name === "email" ? value.toLowerCase() : value
     }));
   };
 
@@ -36,7 +36,7 @@ const LoginPage = () => {
     setError(""); // Clear errors
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/authenticate", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/auth/authenticate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

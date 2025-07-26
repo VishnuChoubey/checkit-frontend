@@ -121,7 +121,7 @@ for (let pair of registerForm.entries()) {
   console.log(pair[0] + ": ", pair[1]);
 }
       const response = await axios.post(
-        "http://localhost:8080/api/auth/registerdriver",
+        `${process.env.REACT_APP_API_BASE}/api/auth/registerdriver`,
         registerForm,
         {
           headers: {

@@ -59,7 +59,7 @@ const RegistrationUser = () => {
     // Prepare FormData for file upload
     const registerForm = new FormData();
     registerForm.append("name", name);
-    registerForm.append("email", email);
+    registerForm.append("email", email.toLowerCase());
     registerForm.append("phone", phone);
     registerForm.append("password", password);
     if (photo) {
@@ -68,7 +68,7 @@ const RegistrationUser = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/register",
+        `${process.env.REACT_APP_API_BASE}/api/auth/register`,
         registerForm,
         {
           headers: {
@@ -106,7 +106,6 @@ const RegistrationUser = () => {
 
   return (
     <>
-      <Navbar />
      <style>{`
 .registration-bg {
   display: flex;

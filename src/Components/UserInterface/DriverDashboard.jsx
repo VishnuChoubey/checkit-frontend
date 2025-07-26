@@ -19,7 +19,7 @@ const DriverDashboard = () => {
     const fetchDriverInfo = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/api/drivers?email=${email}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE}/api/drivers?email=${email}`);
         setDriver(response.data); // Assuming the API returns driver details
         setLoading(false);
       } catch (err) {

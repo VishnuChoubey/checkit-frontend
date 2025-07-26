@@ -49,7 +49,7 @@ const Booking = () => {
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
-        const response = await fetch("http://localhost:8080/api/user/profile", {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/user/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

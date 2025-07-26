@@ -36,6 +36,7 @@ const LoginPage = () => {
     setError(""); // Clear errors
 
     try {
+      console.log(process.env.REACT_APP_API_BASE);
       const response = await fetch(`${process.env.REACT_APP_API_BASE}/api/auth/authenticate`, {
         method: "POST",
         headers: {

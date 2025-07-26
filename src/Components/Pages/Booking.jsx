@@ -150,9 +150,7 @@ const Booking = () => {
       );
 
         setRoutes(response.data || []);
-        if (!response.data?.length) {
-          setError("No routes found between these stops.");
-        }
+      
       } catch (err) {
         setError("Failed to fetch routes. Please try again.");
         console.error("Route fetch error:", err);
@@ -567,15 +565,161 @@ const Booking = () => {
           font-size: 0.875rem;
           font-weight: 500;
         }
-        @media (max-width: 768px) {
-          .form-row {
-            flex-direction: column;
-            gap: 1rem;
-          }
-          .booking-card {
-            padding: 1.5rem;
-          }
-        }
+
+         .qr-code{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    }
+     @media (max-width: 768px) {
+  .booking-container {
+    padding: 1rem 0.5rem;
+    border-radius: 1rem;
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .booking-card {
+    padding: 1rem;
+    border-radius: 0.8rem;
+  }
+
+  .booking-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .booking-subtitle {
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .form-group {
+    width: 100%;
+  }
+
+  .form-input {
+    padding: 0.65rem;
+    font-size: 0.95rem;
+  }
+
+  .suggestions-list {
+    max-height: 150px;
+  }
+
+  .suggestion-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .submit-btn {
+    padding: 0.9rem;
+    font-size: 0.95rem;
+  }
+
+  /* Success card mobile styles */
+  .success-card {
+    padding: 1rem;
+  }
+
+  .success-title {
+    font-size: 1.3rem;
+  }
+
+  .ticket-details {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .ticket-row {
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+  }
+
+  .ticket-label, 
+  .ticket-value {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .ticket-label {
+    margin-bottom: 0.2rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .or-separator {
+    padding: 0;
+    margin: 0.2rem 0;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 0.95rem;
+  }
+
+  /* Features section */
+  .features-container {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  .feature-badge {
+    width: 100%;
+    justify-content: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* QR code sizing */
+  .qrcode-container {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-title {
+    font-size: 1.3rem;
+  }
+
+  .booking-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .form-input {
+    font-size: 0.9rem;
+  }
+
+  .submit-btn {
+    font-size: 0.9rem;
+  }
+
+  .success-title {
+    font-size: 1.2rem;
+  }
+
+  .ticket-label, 
+  .ticket-value {
+    font-size: 0.85rem;
+  }
+    .qr-code{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    }
+}
+
       `}</style>
 
       <div className="booking-container">
@@ -733,7 +877,7 @@ const Booking = () => {
           ) : (
             <div className="success-card">
               <h2 className="success-title">🎉 Booking Confirmed!</h2>
-              <div style={{ margin: "1.5rem 0" }}>
+              <div className="qr-code">
                 <QRCodeCanvas
                   value={JSON.stringify({
                     bookingId: ticketDetails?.bookingId || generateBookingId(),
@@ -751,6 +895,7 @@ const Booking = () => {
                   fgColor="#166534"
                   level="H"
                   includeMargin={true}
+                  
                 />
                 <div
                   style={{

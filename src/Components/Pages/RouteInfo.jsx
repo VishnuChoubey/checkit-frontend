@@ -18,6 +18,7 @@ const RouteInfo = () => {
   const [loadingStops, setLoadingStops] = useState(false);
   const [error, setError] = useState("");
 
+
   // Fetch all stops for suggestions
   useEffect(() => {
     const fetchStops = async () => {
@@ -79,10 +80,14 @@ const RouteInfo = () => {
       return;
     }
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE}/api/vehicle/stopTimes/routes/${encodeURIComponent(
-          source
-        )}/${encodeURIComponent(destination)}`
+    const response = await axios.get(
+        `${process.env.REACT_APP_API_BASE}/api/vehicle/stopTimes/routes`, {
+          params: {
+            sourceStop: source,
+            destinationStop: destination,
+          },
+          withCredentials: true
+        }
       );
       setRoutes(response.data || []);
     } catch (err) {

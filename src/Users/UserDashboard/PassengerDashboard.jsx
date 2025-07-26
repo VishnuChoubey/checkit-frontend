@@ -300,21 +300,95 @@ const PassengerDashboard = () => {
           flex-direction: column;
           gap: 0.3rem;
         }
-        @media (max-width: 900px) {
-          .passenger-container {
-            padding: 1.2rem 0.5rem;
-          }
-          .passenger-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-          }
-          .profile-section {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.7rem;
-          }
-        }
+      @media (max-width: 768px) {
+  .passenger-container {
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 1.2rem;
+    box-shadow: none;
+  }
+
+  .passenger-header {
+    flex-direction: column;
+    align-items: center;
+    margin-left: 0;
+    padding: 1rem;
+    max-width: 100%;
+    border-radius: 1rem;
+  }
+
+  .profile-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-picture {
+    width: 70px;
+    height: 70px;
+  }
+
+  .profile-details {
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .wallet-balance {
+  display:none;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    width: 100%;
+    align-items: center;
+  }
+
+  .passenger-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: 0;
+  }
+
+  .passenger-tabs button {
+    width: 100%;
+    justify-content: center;
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
+
+  .dashboard-content,
+  .tickets-content,
+  .routes-content {
+    margin: 1rem 0 0 0;
+    padding: 1rem;
+    max-width: 100%;
+  }
+    .dashboard-content h2{
+    text-align:center;
+    }
+
+  .dashboard-cards {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .dashboard-card {
+    flex: 1 1 auto;
+    padding: 1rem;
+  }
+
+  .ticket-table {
+    font-size: 0.85rem;
+    overflow-x: auto;
+    display: block;
+    white-space: nowrap;
+  }
+
+  .favorite-route-card {
+    padding: 1rem;
+  }
+}
+
       `}</style>
       <div className="passenger-container">
         <div className="passenger-header">
@@ -326,14 +400,14 @@ const PassengerDashboard = () => {
             ) : profile ? (
               <>
                <img
-  className="profile-picture"
-  src={
-    profile.profilePictureUrl
-      ? profile.profilePictureUrl
-      : "https://ui-avatars.com/api/?name=" + encodeURIComponent(profile.name || "User")
-  }
-  alt="Profile"
-/>
+                    className="profile-picture"
+                    src={
+                      profile.profilePictureUrl
+                        ? profile.profilePictureUrl
+                        : "https://ui-avatars.com/api/?name=" + encodeURIComponent(profile.name || "User")
+                    }
+                    alt="Profile"
+                  />
 
                 <div className="profile-details">
                   <span className="profile-name">{profile.name}</span>

@@ -22,11 +22,11 @@ function NewApp() {
 
   return (
     <div className="container">
-      <Sidebar active={sidebarActive} />
-      <div className={`main ${sidebarActive ? 'active' : ''}`}>
-        <Topbar toggleSidebar={toggleSidebar} />
-        <Routes>
-          <Route path="" element={<DashboardPage />} />
+      {/* <Sidebar active={sidebarActive} />
+      <div className={`main ${sidebarActive ? 'active' : ''}`}> */}
+        {/* <Topbar toggleSidebar={toggleSidebar} /> */}
+        {/* <Routes> */}
+          {/* <Route path="" element={<DashboardPage />} />
           <Route path="buses" element={<BusesPage />} />
           <Route path="staff" element={<StaffPage />} />
           <Route path="routes" element={<RoutesPage />} />
@@ -34,9 +34,9 @@ function NewApp() {
           <Route path="emergency" element={<EmergencyPage />} />
           <Route path="drivers" element={<DriversPage />} />
           <Route path="driverprofile" element={<DriverProfile />} />
-          <Route path="passengers" element={<PassengerDashboard />} />
-        </Routes>
-      </div>
+          <Route path="passengers" element={<PassengerDashboard />} /> */}
+        {/* </Routes> */}
+      {/* </div> */}
     </div>
   );
 }

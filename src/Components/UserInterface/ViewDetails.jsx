@@ -231,17 +231,7 @@ const ViewDetails = () => {
           font-size: 1.1rem;
           margin-bottom: 1.5rem;
         }
-        @media (max-width: 1050px) {
-          .viewdetails-main {
-            margin-left: 0;
-            padding: 1rem 0.2rem;
-          }
-          .viewdetails-card-separator {
-            width: 40px;
-            height: 6px;
-            top: -12px;
-          }
-        }
+   
         .home-card {
           
           border-radius: 2rem;             /* Tailwind: rounded-2xl = 1rem (16px) */
@@ -255,6 +245,220 @@ const ViewDetails = () => {
           margin-right: 0.4rem;
           background: linear-gradient(90deg, #f0fdf4 60%, #bbf7d0 100%);
         }
+
+      
+ /* Bus Cards Container */
+  .bus-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
+  }
+
+  /* Bus Card */
+  .bus-card {
+    width: 100%;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .bus-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .bus-card-content {
+    padding: 1rem;
+  }
+
+  /* Bus Card Header */
+  .bus-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .bus-info-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .bus-icon-container {
+    background: #dbeafe;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+  }
+
+  .bus-icon {
+    color: #2563eb;
+    font-size: 1.5rem;
+  }
+
+  .bus-details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bus-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+  }
+
+  .bus-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  .bus-route {
+    font-size: 0.95rem;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+  }
+
+  .route-icon {
+    margin-right: 0.25rem;
+    color: #9ca3af;
+  }
+
+  .bus-status {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 500;
+  }
+
+  .bus-status.moving {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .bus-status.idle {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+
+  .bus-update-time {
+    text-align: right;
+  }
+
+  .update-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .update-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0;
+  }
+
+  /* Stats Grid */
+  .bus-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Next Stop Section */
+  .next-stop-container {
+    background: #dbeafe;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .next-stop-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .next-stop-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1e40af;
+  }
+
+  .next-stop-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e40af;
+  }
+
+  /* Mobile Styles */
+  @media (max-width: 768px) {
+    .bus-card {
+      border-radius: 0.75rem;
+    }
+
+    .bus-card-header {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .bus-info-container {
+      width: 100%;
+    }
+
+    .bus-update-time {
+      text-align: left;
+      width: 100%;
+    }
+
+    .bus-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .next-stop-container {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .bus-stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .bus-icon-container {
+      padding: 0.5rem;
+    }
+
+    .bus-icon {
+      font-size: 1.25rem;
+    }
+
+    .bus-number {
+      font-size: 1.1rem;
+    }
+
+    .bus-route {
+      font-size: 0.85rem;
+    }
+
+    .bus-status {
+      font-size: 0.75rem;
+    }
+  }
+  
       `}</style>
      
         {/* Sidebar/Navbar */}
@@ -370,7 +574,7 @@ const SearchInput = React.memo(({
 ));
 
 const BusCardsContainer = React.memo(({ buses, onBusClick }) => (
-  <div className="space-y-4 mt-6">
+  <div className="bus-cards-container">
     {buses.map(bus => (
       <BusCard
         key={bus.vehicleId}
@@ -386,77 +590,72 @@ const BusCard = React.memo(({ bus, onClick }) => (
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.2 }}
-    className="w-full bg-white rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer border border-gray-200"
+    className="bus-card"
     onClick={onClick}
   >
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-4">
-          <div className="bg-blue-100 p-2 rounded-lg">
-            <FaBus className="text-blue-600 text-2xl" />
+    <div className="bus-card-content">
+      <div className="bus-card-header">
+        <div className="bus-info-container">
+          <div className="bus-icon-container">
+            <FaBus className="bus-icon" />
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-800">Bus {bus.vehicleId}</h3>
-            <div className="flex items-center mt-1 space-x-4">
-              <span className="text-base text-gray-600 flex items-center">
-                <FaRoute className="mr-1 text-gray-400" />
+          <div className="bus-details">
+            <h3 className="bus-number">Bus {bus.vehicleId}</h3>
+            <div className="bus-meta">
+              <span className="bus-route">
+                <FaRoute className="route-icon" />
                 Route {bus.routeId}
               </span>
-              <span className={`text-sm px-2 py-1 rounded-full ${
-                bus.speed > 0 ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-              }`}>
+              <span className={`bus-status ${bus.speed > 0 ? 'moving' : 'idle'}`}>
                 {bus.speed > 0 ? "Moving" : "Idle"}
               </span>
             </div>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-xs text-gray-500">Last updated</p>
-          <p className="text-base font-semibold text-gray-700">
+        <div className="bus-update-time">
+          <p className="update-label">Last updated</p>
+          <p className="update-value">
             {bus.timestamp ? new Date(bus.timestamp).toLocaleTimeString() : "--:--"}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-4">
+      <div className="bus-stats-grid">
         <StatItem
-          icon={<FaTachometerAlt className="text-green-500 text-lg" />}
+          icon={<FaTachometerAlt className="stat-icon speed" />}
           label="Speed"
           value={`${bus.speed ? bus.speed.toFixed(2) : 0} km/h`}
         />
         <StatItem
-          icon={<FaCompass className="text-blue-500 text-lg" />}
+          icon={<FaCompass className="stat-icon direction" />}
           label="Direction"
           value={bus.direction || "N/A"}
         />
         <StatItem
-          icon={<FaMapMarkerAlt className="text-red-500 text-lg" />}
+          icon={<FaMapMarkerAlt className="stat-icon next-stop" />}
           label="Next StopId"
           value={`No. ${bus.nextStopId}` || "N/A"}
           truncate
         />
         <StatItem
-          icon={<FaClock className="text-purple-500 text-lg" />}
+          icon={<FaClock className="stat-icon eta" />}
           label="ETA"
           value={bus.eta !== undefined ? `${bus.eta} min` : "N/A"}
         />
       </div>
 
- {bus.nextStopName&& (
-  <div className="bg-blue-100 rounded-md px-4 py-2 flex items-center justify-between">
-    <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4">
-      <span className="text-base font-semibold text-blue-800">
-        Next Stop:
-      </span>
-      <span className="text-lg font-bold text-blue-700">
-        {bus.nextStopName}
-      </span>
-    </div>
-  </div>
-)}
+      {bus.nextStopName && (
+        <div className="next-stop-container">
+          <div className="next-stop-info">
+            <span className="next-stop-label">Next Stop:</span>
+            <span className="next-stop-name">{bus.nextStopName}</span>
+          </div>
+        </div>
+      )}
     </div>
   </motion.div>
 ));
+
 
 const StatItem = React.memo(({ icon, label, value, truncate = false }) => (
   <div className="bg-gray-100 rounded-md p-3">

@@ -435,7 +435,7 @@ const ViewDetails = () => {
 
   @media (max-width: 480px) {
     .bus-stats-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .bus-icon-container {

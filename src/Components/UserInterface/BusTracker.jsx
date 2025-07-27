@@ -376,10 +376,10 @@ const BusTracker = () => {
         .bustracker-statusbar {
           background: #16a34a;
           color: #fff;
-          border-radius: 1.2rem 1.2rem 0 0;
+          border-radius: 1rem;
           box-shadow: 0 2px 8px rgba(22,163,74,0.08);
           padding: 1rem 0.7rem 0.7rem 0.7rem;
-          margin-bottom: 1.2rem;
+          margin-bottom: 0.5rem;
           width: 100%;
           max-width: 1050px;
           display: flex;
@@ -413,10 +413,10 @@ const BusTracker = () => {
           width: 100%;
           max-width: 1050px;
           background: #fff;
-          border-radius: 0 0 1.2rem 1.2rem;
+          border-radius: 1rem ;
           box-shadow: 0 2px 12px rgba(22,163,74,0.08);
           overflow: hidden;
-          margin-bottom: 2rem;
+          margin-bottom: 0.5rem;
         }
         #bus-map {
           width: 100%;
@@ -513,19 +513,27 @@ const BusTracker = () => {
           background: ${connectionStatus === "Connected to real-time data" ? "#bbf7d0" : "#fee2e2"};
           color: ${connectionStatus === "Connected to real-time data" ? "#166534" : "#b91c1c"};
           font-weight: 600;
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
         }
         @media (max-width: 900px) {
           .bustracker-main {
-            margin-left: 0;
-            padding: 1rem 0.2rem;
+            margin-top:3px;
+          
+          
+          
+          
           }
+            .bustracker-layout{
+             padding:0;
+           
+            }
           .bustracker-statusbar,
           .bustracker-map-section,
           .bustracker-details {
             padding-left: 0.7rem;
             padding-right: 0.7rem;
             max-width: 100vw;
+            
           }
           .bustracker-statusbar {
             flex-direction: column;
@@ -568,7 +576,7 @@ const BusTracker = () => {
 
           {/* Map Section */}
           <div className="bustracker-map-section">
-            <div id="bus-map" style={{ width: "100%", height: "420px" }}></div>
+            <div id="bus-map" style={{ width: "100%", height: "420px" ,borderRadius:"12px",margin:"2px"}}></div>
           </div>
 
           {/* Details Section */}

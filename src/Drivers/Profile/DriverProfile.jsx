@@ -288,27 +288,243 @@ const DriverProfile = () => {
           font-size: 0.97rem;
           color: #374151;
         }
-        @media (max-width: 600px) {
-          .driver-profile-container {
-            padding: 0.7rem 0.1rem;
-            max-width: 99vw;
-          }
-          .profile-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.6rem;
-          }
-          .profile-photo-section {
-            gap: 0.6rem;
-          }
-          .profile-details .detail-row {
-            flex-direction: column;
-            gap: 0.15rem;
-          }
-          .assigned-bus-card, .performance-card {
-            padding: 0.7rem 0.5rem;
-          }
-        }
+       @media (max-width: 768px) {
+  .driver-profile-container {
+    padding: 1rem;
+    margin: 0.5rem auto;
+    border-radius: 0.8rem;
+    max-width: 100%;
+    width: 95%;
+  }
+
+  /* Profile Header */
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .profile-photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+  }
+
+  .profile-photo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+  }
+
+  .profile-photo img {
+    width: 80px;
+    height: 80px;
+    border: 3px solid #bbf7d0;
+  }
+
+  .profile-basic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .profile-basic h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .profile-basic .role {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-basic .status {
+    font-size: 0.9rem;
+    padding: 0.2rem 1rem;
+  }
+
+  /* Action Buttons */
+  .profile-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .btn-edit, 
+  .btn-save, 
+  .btn-cancel {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+  }
+
+  .edit-actions {
+    display: flex;
+    gap: 0.8rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Tabs */
+  .profile-tabs {
+    display: flex;
+    flex-direction:column;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .profile-tabs button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: fit-content;
+  }
+
+  /* Profile Content */
+  .profile-content {
+    padding: 0.5rem;
+  }
+    .profile-details h3{
+      color:white;
+      
+       background-color:red;
+       border-radius:12px;
+       text-align:center;
+
+    }
+
+  .profile-details .detail-row {
+    display: flex;
+   
+    gap: 0rem;
+    margin-bottom: 0.8rem;
+   
+  
+  }
+
+  .profile-details .detail-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #166534;
+    margin-bottom: 0.2rem;
+  }
+
+  .profile-details .detail-value {
+    font-size: 1rem;
+    color: #374151;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Form Styles */
+  .profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .profile-form .form-group {
+    width: 100%;
+    margin-bottom: 0;
+  
+  }
+
+  .profile-form label {
+    font-size: 0.95rem;
+    text-align: center;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .profile-form input,
+  .profile-form textarea,
+  .profile-form select {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 0.5rem;
+    text-align: center;
+  }
+
+  .profile-form h3 {
+    text-align: center;
+    margin: 1rem auto 0.5rem;
+    width: 100%;
+  }
+
+  /* Cards */
+  .assigned-bus-card,
+  .performance-card {
+    padding: 1rem;
+    margin: 1rem auto;
+    text-align: center;
+    max-width: 100%;
+  }
+
+  .assigned-bus-title,
+  .performance-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .assigned-bus-details,
+  .performance-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  /* Photo Upload */
+  #photoInput {
+    margin: 0.5rem auto 0;
+    display: block;
+    width: fit-content;
+  }
+
+  /* Meta Info */
+  .profile-meta {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Very small screens adjustments */
+  @media (max-width: 400px) {
+    .profile-tabs button {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.85rem;
+    }
+    
+    .btn-edit, 
+    .btn-save, 
+    .btn-cancel {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+  }
+}
       `}</style>
       <div className="driver-profile-container">
         <div className="profile-header">

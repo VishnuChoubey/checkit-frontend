@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../../Components/Main/Navbar';
+
+import  {  useCallback, useMemo, useRef } from "react";
+import {FaEdit, FaBus, FaTicketAlt, FaInfoCircle, FaClock, FaMapMarkerAlt, FaTachometerAlt, FaCompass, FaRoute } from "react-icons/fa";
+import { Link } from 'react-router-dom';
+import { FaBars, FaTimes,FaSave } from "react-icons/fa";
 
 const PassengerDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -9,7 +13,74 @@ const PassengerDashboard = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [profileError, setProfileError] = useState("");
   const [loadingTickets, setLoadingTickets] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
+  const [saving, setSaving] = useState(false);
+      useEffect(() => {
+    if (profile) {
+      setEditForm({
+        name: profile.name || "",
+        email: profile.email || "",
+        phone: profile.phone || ""
+      });
+    }
+  }, [profile]);
 
+
+   const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+    const handleEditCancel = () => {
+    setIsEditing(false);
+    setEditForm({
+      name: profile.name || "",
+      email: profile.email || "",
+      phone: profile.phone || ""
+    });
+  };
+
+
+  
+  const handleEditSave = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE}/api/user/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(editForm),
+        }
+      );
+      if (response.ok) {
+        const updated = await response.json();
+        setProfile(updated);
+        setIsEditing(false);
+      } else {
+        alert("Failed to update profile.");
+      }
+    } catch (err) {
+      alert("Failed to update profile.");
+    }
+    setSaving(false);
+  };
   // Fetch user profile
   useEffect(() => {
     const fetchProfile = async () => {
@@ -264,6 +335,22 @@ const PassengerDashboard = () => {
   color: #007bff;
   margin-bottom: 0.5rem;
 }
+ .edit-btn {
+          background-color: #16a34a;
+          color: white;
+          border: none;
+          border-radius: 0.7rem;
+          padding: 0.5rem 1rem;
+          font-size: 1rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: background 0.2s;
+          height:50px;
+           margin-top:18px;
+           margin-right:18px;
+        }
 
         .ticket-table {
           width: 100%;
@@ -389,6 +476,102 @@ const PassengerDashboard = () => {
   }
 }
 
+.action-buttons-container {
+  width: 100%;
+  max-width: 926px;
+  margin-top: 20px;
+  margin-left: 15px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  background-color: white;
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.action-button .icon {
+  font-size: 18px;
+}
+
+.action-button span {
+  text-decoration: none;
+}
+
+.action-button.blue {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.action-button.blue:hover {
+  background-color: #bae6fd;
+}
+
+.action-button.green {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.action-button.green:hover {
+  background-color: #bbf7d0;
+}
+
+.action-button.purple {
+  background-color: #ede9fe;
+  color: #6b21a8;
+}
+
+.action-button.purple:hover {
+  background-color: #ddd6fe;
+}
+
+.action-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Responsive for tablets and up */
+@media (max-width: 768px) {
+  .action-buttons-container {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 16px;
+   
+    margin:0;
+    
+    
+ 
+  }
+
+  .action-button {
+    font-size: 16px;
+    padding: 16px;
+  }
+
+  .action-button .icon {
+    font-size: 20px;
+  }
+}
+
+
       `}</style>
       <div className="passenger-container">
         <div className="passenger-header">
@@ -408,11 +591,50 @@ const PassengerDashboard = () => {
                     }
                     alt="Profile"
                   />
+                  
 
-                <div className="profile-details">
-                  <span className="profile-name">{profile.name}</span>
-                  <span className="profile-email">{profile.email}</span>
-                  <span className="profile-phone">{profile.phone}</span>
+
+
+
+
+
+
+                  
+  <div className="profile-details">
+                  {isEditing ? (
+                    <>
+                      <input
+                        type="text"
+                        name="name"
+                        value={editForm.name}
+                        onChange={handleEditChange}
+                        className="profile-edit-input"
+                        placeholder="Name"
+                      />
+                      <input
+                        type="email"
+                        name="email"
+                        value={editForm.email}
+                        onChange={handleEditChange}
+                        className="profile-edit-input"
+                        placeholder="Email"
+                      />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={editForm.phone}
+                        onChange={handleEditChange}
+                        className="profile-edit-input"
+                        placeholder="Phone"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <span className="profile-name">{profile.name}</span>
+                      <span className="profile-email">{profile.email}</span>
+                      <span className="profile-phone">{profile.phone}</span>
+                    </>
+                  )}
                 </div>
               </>
             ) : null}
@@ -426,7 +648,38 @@ const PassengerDashboard = () => {
             <button className="btn-add-money">
               <ion-icon name="add-outline"></ion-icon> Add Money
             </button>
+         
           </div>
+
+
+
+
+
+          {!loadingProfile && profile && (
+            isEditing ? (
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  className="edit-btn"
+                  onClick={handleEditSave}
+                  disabled={saving}
+                  style={{ background: "#2563eb" }}
+                >
+                  <FaSave /> {saving ? "Saving..." : "Save"}
+                </button>
+                <button
+                  className="edit-btn"
+                  onClick={handleEditCancel}
+                  style={{ background: "#dc2626" }}
+                >
+                  <FaTimes /> Cancel
+                </button>
+              </div>
+            ) : (
+              <button className="edit-btn" onClick={handleEditClick}>
+                <FaEdit /> Edit
+              </button>
+            )
+          )}
         </div>
         {/* Tabs */}
         <div className="passenger-tabs">
@@ -449,6 +702,7 @@ const PassengerDashboard = () => {
             <ion-icon name="map-outline"></ion-icon> Favorite Routes
           </button>
         </div>
+        <ActionButtons/>
         {/* Dashboard Tab */}
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
@@ -550,4 +804,30 @@ const PassengerDashboard = () => {
   );
 };
 
+
+const ActionButtons = React.memo(() => (
+  <div className="action-buttons-container">
+    <button className="action-button blue">
+      <FaBus className="icon" />
+      <span>Nearby Buses</span>
+    </button>
+
+    <button className="action-button green">
+      <FaTicketAlt className="icon" />
+      <Link to="/booking"><span>Book Ticket</span></Link>
+    </button>
+
+    <button className="action-button purple">
+      <Link to="/routeinfo" className="action-link">
+        <FaInfoCircle className="icon" />
+        <span>Route Info</span>
+      </Link>
+    </button>
+  </div>
+));
+
+
+
+
 export default PassengerDashboard;
+
